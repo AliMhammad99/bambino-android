@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "981021712579",
+    "firebase_url": "https://bambino-4aba4-default-rtdb.firebaseio.com",
+    "project_id": "bambino-4aba4",
+    "storage_bucket": "bambino-4aba4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:981021712579:android:2888276cab55b36a01c276",
+        "android_client_info": {
+          "package_name": "com.fyp.bambino"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "981021712579-4rt719dod6mrjlad5mrf6rpc5nnk9uja.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBzcEuj0YIsC1uYrfx7zELX0a26cbvSN_M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "981021712579-4rt719dod6mrjlad5mrf6rpc5nnk9uja.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
