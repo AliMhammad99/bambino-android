@@ -62,53 +62,8 @@ public class SplashScreen extends AppCompatActivity {
 
 
         byte c[] = outputStream.toByteArray( );
-        Log.i("DPC: ", String.valueOf(c.length));
-
-        Log.i("DP0: ", String.valueOf(dp0.length));
-        Log.i("DP1: ", String.valueOf(dp1.length));
-        Log.i("DP2: ", String.valueOf(dp2.length));
-        Log.i("DP3: ", String.valueOf(dp3.length));
-        Log.i("DP4: ", String.valueOf(dp4.length));
-        Log.i("DP5: ", String.valueOf(dp5.length));
-        Log.i("DP6: ", String.valueOf(dp6.length));
-        Log.i("DP7: ", String.valueOf(dp7.length));
-        Log.i("DP8: ", String.valueOf(dp8.length));
-        Log.i("DPL: ", String.valueOf(dpL.length));
 
         Bitmap b = BitmapFactory.decodeByteArray(c, 0, c.length);
-
-//        Bitmap b0 = BitmapFactory.decodeByteArray(dp0, 0, dp0.length);
-//        Bitmap b1 = BitmapFactory.decodeByteArray(dp1, 0, dp1.length);
-//        Bitmap b2 = BitmapFactory.decodeByteArray(dp2, 0, dp2.length);
-//        Bitmap b3 = BitmapFactory.decodeByteArray(dp3, 0, dp3.length);
-//        Bitmap b4 = BitmapFactory.decodeByteArray(dp4, 0, dp4.length);
-//        Bitmap b5 = BitmapFactory.decodeByteArray(dp5, 0, dp5.length);
-//        Bitmap b6 = BitmapFactory.decodeByteArray(dp6, 0, dp6.length);
-//        Bitmap b7 = BitmapFactory.decodeByteArray(dp7, 0, dp7.length);
-//        Bitmap b8 = BitmapFactory.decodeByteArray(dp8, 0, dp8.length);
-//        Bitmap bL = BitmapFactory.decodeByteArray(dpL, 0, dpL.length);
-
-//        Log.i("Bitmap Height:   ", String.valueOf(b2.getHeight()));
-
-//        // Create a new bitmap of desired size
-//        Bitmap combinedBitmap = Bitmap.createBitmap(1024, 768, Bitmap.Config.ARGB_8888);
-//
-//        // Create a canvas to draw the bitmaps onto
-//        Canvas canvas = new Canvas(combinedBitmap);
-
-        // Draw b0 onto the canvas
-//        canvas.drawBitmap(b0, 0, 0, null);
-//        canvas.drawBitmap(b1, 0, 0, null);
-//        canvas.drawBitmap(b2, 0, 0, null);
-//        canvas.drawBitmap(b3, 0, 0, null);
-//        canvas.drawBitmap(b4, 0, 0, null);
-//        canvas.drawBitmap(b5, 0, 0, null);
-//        canvas.drawBitmap(b6, 0, 0, null);
-//        canvas.drawBitmap(b7, 0, 0, null);
-//        canvas.drawBitmap(b8, 0, 0, null);
-//        canvas.drawBitmap(bL, 0, 0, null);
-
-
 
         ImageView imageView = this.findViewById(R.id.imageView2);
 
