@@ -6,4 +6,75 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginVertical="20dp"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragmentContainerView2"
+            android:name="com.fyp.bambino.DashBoardFragment"
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_weight="0.7"
+            tools:layout="@layout/fragment_dash_board" />
+
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="0dp"
+            android:layout_gravity="center"
+            android:layout_weight="0.1"
+            android:background="@drawable/slc_nav"
+            android:gravity="center"
+
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:layout_width="40dp"
+                android:layout_height="40dp">
+
+                <ImageButton
+                    android:id="@+id/btn_dashboard"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+
+                    android:background="@drawable/ic_dashboard"
+                    android:scaleType="fitCenter"
+                    android:tooltipText="Dashboard" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="52.59dp"
+                android:layout_height="35dp"
+                android:layout_marginHorizontal="45dp">
+
+                <ImageButton
+                    android:id="@+id/btn_live_video"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ic_live_video"
+                    android:scaleType="fitCenter"
+                    android:tooltipText="Live Video" />
+            </FrameLayout>
+
+            <FrameLayout
+                android:layout_width="41.73dp"
+                android:layout_height="44.26dp">
+
+                <ImageButton
+                    android:id="@+id/btn_config"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/ic_config"
+                    android:scaleType="fitCenter"
+                    android:tooltipText="Configuration" />
+            </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
