@@ -52,7 +52,7 @@
             <FrameLayout
                 android:layout_width="52.59dp"
                 android:layout_height="35dp"
-                android:layout_marginHorizontal="45dp">
+                android:layout_marginHorizontal="50dp">
 
                 <ImageButton
                     android:id="@+id/btn_live_video"
