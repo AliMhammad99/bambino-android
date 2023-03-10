@@ -22,32 +22,39 @@
             android:name="com.fyp.bambino.DashBoardFragment"
             android:layout_width="fill_parent"
             android:layout_height="0dp"
-            android:layout_weight="0.7"
+            android:layout_weight="0.72"
             tools:layout="@layout/fragment_dash_board" />
 
         <LinearLayout
             android:layout_width="fill_parent"
             android:layout_height="0dp"
             android:layout_gravity="center"
-            android:layout_weight="0.1"
+            android:layout_marginTop="20dp"
+            android:layout_weight="0.08"
             android:background="@drawable/slc_nav"
             android:gravity="center"
-
             android:orientation="horizontal">
 
-            <FrameLayout
-                android:layout_width="40dp"
-                android:layout_height="40dp">
+            <LinearLayout
+                android:layout_width="70dp"
+                android:layout_height="40dp"
+                android:orientation="vertical">
 
-                <ImageButton
-                    android:id="@+id/btn_dashboard"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                <FrameLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
 
-                    android:background="@drawable/ic_dashboard"
-                    android:scaleType="fitCenter"
-                    android:tooltipText="Dashboard" />
-            </FrameLayout>
+                    <ImageButton
+                        android:id="@+id/btn_dashboard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:adjustViewBounds="true"
+                        android:background="@drawable/ic_live_video"
+                        android:scaleType="fitCenter"
+                        android:tooltipText="Dashboard" />
+                </FrameLayout>
+            </LinearLayout>
 
             <FrameLayout
                 android:layout_width="52.59dp"
@@ -76,5 +83,14 @@
                     android:tooltipText="Configuration" />
             </FrameLayout>
         </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btn_dashboar"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:adjustViewBounds="true"
+            android:background="@drawable/ic_live_video"
+            android:scaleType="fitXY"
+            android:tooltipText="Dashboard" />
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
