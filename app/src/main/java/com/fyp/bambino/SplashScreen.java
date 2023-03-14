@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
 import android.widget.CompoundButton;
@@ -34,6 +35,8 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class SplashScreen extends AppCompatActivity {
 
@@ -49,7 +52,23 @@ public class SplashScreen extends AppCompatActivity {
 
         imageView = findViewById(R.id.live_video);
         requestQueue = Volley.newRequestQueue(this);
-        getImageFromServer();
+
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Call your PHP server here
+                        getImageFromServer();
+                    }
+                });
+            }
+        };
+        // Schedule the timer to run every 1 second
+        timer.schedule(timerTask, 0, 1000);
     }
 
     private void getImageFromServer() {
@@ -81,7 +100,7 @@ public class SplashScreen extends AppCompatActivity {
     private void renderToImageView(DataSnapshot dataSnapshot) {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 
-        for (long i = 0; i < (long)dataSnapshot.child("nbSubStrings").getValue(); i++) {
+        for (long i = 0; i < (long) dataSnapshot.child("nbSubStrings").getValue(); i++) {
             String base64Chunk = (String) dataSnapshot.child("c").child("p" + i).getValue();
 //            Log.i("DECODING: ", String.valueOf(i));
 //            Log.i("DECODING: ", (String) dataSnapshot.child("c").child("p" + i).getValue());
