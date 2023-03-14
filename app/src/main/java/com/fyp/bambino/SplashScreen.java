@@ -14,7 +14,13 @@ import android.util.Log;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
+import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.database.DataSnapshot;
@@ -31,76 +37,45 @@ import java.io.IOException;
 
 public class SplashScreen extends AppCompatActivity {
 
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
+    private ImageView imageView;
+    private RequestQueue requestQueue;
+    private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
 
-    boolean prevRender = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference();
-//        databaseReference.child("/FlashLED").setValue(true);
+        imageView = findViewById(R.id.live_video);
+        requestQueue = Volley.newRequestQueue(this);
+        getImageFromServer();
+    }
 
-        Switch flashLEDButton = findViewById(R.id.flash_led_toggle_button);
-        databaseReference.child("/FlashLED").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (!task.isSuccessful()) {
+    private void getImageFromServer() {
+        ImageRequest imageRequest = new ImageRequest(imageUrl,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap responseBitmap) {
+                        Matrix matrix = new Matrix();
 
-                    Log.e("firebase", "Error getting data", task.getException());
-                }
-                else {
-                    flashLEDButton.setChecked((boolean) task.getResult().getValue());
-//                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                }
-            }
-        });
+                        matrix.postRotate(90);
 
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
 
+                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
-        flashLEDButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // Code to be executed when the switch button is checked or unchecked
-//                Log.i("FLASH:  ", String.valueOf(isChecked));
-                databaseReference.child("/FlashLED").setValue(isChecked);
-            }
-        });
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                if(dataSnapshot.hasChild("c")){
-                    if(dataSnapshot.hasChild("uploading")){
-                        boolean render = !(boolean) dataSnapshot.child("uploading").getValue();
-                        Log.i("RENDER:   ", String.valueOf(render));
-                        if(render && !prevRender) {
-                            prevRender = true;
-                            Log.i("RENDER 1:   ", String.valueOf(render));
-                            renderToImageView(dataSnapshot);
-
-                        }
-                        if(!render){
-                            prevRender = false;
-                        }
+                        imageView.setImageBitmap(rotatedBitmap);
                     }
-                }
-//                Log.i("POST", String.valueOf(dataSnapshot.getValue()));
+                }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(SplashScreen.this, "Error retrieving image", Toast.LENGTH_SHORT).show();
+                    }
+                });
 
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-            }
-        };
-        databaseReference.addValueEventListener(postListener);
+        requestQueue.add(imageRequest);
     }
 
     private void renderToImageView(DataSnapshot dataSnapshot) {
