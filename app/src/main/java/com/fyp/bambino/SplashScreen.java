@@ -56,17 +56,6 @@ public class SplashScreen extends AppCompatActivity {
         imageView = findViewById(R.id.live_video);
         requestQueue = Volley.newRequestQueue(this);
 
-        Switch flashLEDButton = findViewById(R.id.flash_led_toggle_button);
-        getFlashLEDFromServer(flashLEDButton);
-
-
-        flashLEDButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // Code to be executed when the switch button is checked or unchecked
-                setFlashLEDOnServer(isChecked);
-            }
-        });
 
         final Handler handler = new Handler();
         Timer timer = new Timer();
@@ -84,6 +73,18 @@ public class SplashScreen extends AppCompatActivity {
         };
         // Schedule the timer to run every 1 second
         timer.schedule(timerTask, 0, 2000);
+
+        Switch flashLEDButton = findViewById(R.id.flash_led_toggle_button);
+        getFlashLEDFromServer(flashLEDButton);
+
+
+        flashLEDButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Code to be executed when the switch button is checked or unchecked
+                setFlashLEDOnServer(isChecked);
+            }
+        });
     }
 
     private void getFlashLEDFromServer(Switch flashLEDButton) {
@@ -106,7 +107,7 @@ public class SplashScreen extends AppCompatActivity {
     }
 
     private void setFlashLEDOnServer(boolean flashLED) {
-        StringRequest stringRequest = new StringRequest(Request.Method.GET, setFlashLEDUrl+flashLED, null, null);
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, setFlashLEDUrl + flashLED, null, null);
         requestQueue.add(stringRequest);
     }
 
