@@ -7,24 +7,17 @@ import android.view.View;
 import android.widget.ImageButton;
 
 public class MainActivity extends AppCompatActivity {
-
-    private ImageButton buttonDashBoard;
-    private ImageButton buttonLiveVideo;
-    private ImageButton buttonConfig;
-
-
+    
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-        buttonDashBoard = findViewById(R.id.btn_dashboard);
-        buttonLiveVideo = findViewById(R.id.btn_live_video);
-        buttonConfig = findViewById(R.id.btn_config);
-        setupNavButton(buttonDashBoard);
-        setupNavButton(buttonLiveVideo);
-        setupNavButton(buttonConfig);
+
+        setupNavButton(findViewById(R.id.btn_dashboard));
+        setupNavButton(findViewById(R.id.btn_live_video));
+        setupNavButton(findViewById(R.id.btn_config));
 
     }
 
