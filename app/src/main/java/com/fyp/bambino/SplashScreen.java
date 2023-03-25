@@ -92,6 +92,7 @@ public class SplashScreen extends AppCompatActivity {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
+                        Log.i("flashLEDButton:  ",response);
                         boolean result = Boolean.parseBoolean(response);
                         flashLEDButton.setChecked(result);
                         // Handle the boolean value
