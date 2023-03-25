@@ -97,41 +97,4 @@ public class SplashScreen extends AppCompatActivity {
         requestQueue.add(imageRequest);
     }
 
-    private void renderToImageView(DataSnapshot dataSnapshot) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        for (long i = 0; i < (long) dataSnapshot.child("nbSubStrings").getValue(); i++) {
-            String base64Chunk = (String) dataSnapshot.child("c").child("p" + i).getValue();
-//            Log.i("DECODING: ", String.valueOf(i));
-//            Log.i("DECODING: ", (String) dataSnapshot.child("c").child("p" + i).getValue());
-            byte[] decodedBytes = Base64.decode(base64Chunk, Base64.DEFAULT);
-            try {
-                outputStream.write(decodedBytes);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        String base64Chunk = (String) dataSnapshot.child("c").child("pL").getValue();
-        byte[] decodedBytes = Base64.decode(base64Chunk, Base64.DEFAULT);
-        try {
-            outputStream.write(decodedBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        byte fullDecodedBytes[] = outputStream.toByteArray();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(fullDecodedBytes, 0, fullDecodedBytes.length);
-
-        ImageView imageView = findViewById(R.id.live_video);
-
-        Matrix matrix = new Matrix();
-
-        matrix.postRotate(90);
-
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
-
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-
-        imageView.setImageBitmap(rotatedBitmap);
-    }
 }
