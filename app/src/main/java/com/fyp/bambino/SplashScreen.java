@@ -48,7 +48,7 @@ public class SplashScreen extends AppCompatActivity {
                 startActivity(new Intent(SplashScreen.this, MainActivity.class));
                 finish();
             }
-        }, 3000);
+        }, 0);
 //        firebaseDatabase = FirebaseDatabase.getInstance();
 //        databaseReference = firebaseDatabase.getReference();
 ////        databaseReference.child("/FlashLED").setValue(true);
