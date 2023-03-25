@@ -4,6 +4,8 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +16,9 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class LiveVideoFragment extends Fragment {
+    private Handler handler;
+    private Runnable runnable;
+
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -58,7 +63,27 @@ public class LiveVideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        // Create the handler and runnable for the repeating task
+        handler = new Handler();
+        runnable = new Runnable() {
+            @Override
+            public void run() {
+                Log.d("MyFragment", "Hello, world!");
+                handler.postDelayed(this, 1000);
+            }
+        };
+
+        // Start the repeating task
+        handler.postDelayed(runnable, 1000);
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_live_video, container, false);
+
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Stop the repeating task when the fragment is no longer visible
+        handler.removeCallbacks(runnable);
     }
 }
