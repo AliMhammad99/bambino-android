@@ -17,10 +17,12 @@ import android.widget.ImageView;
 import android.widget.Switch;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -43,7 +45,8 @@ public class SplashScreen extends AppCompatActivity {
     private ImageView imageView;
     private RequestQueue requestQueue;
     private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
-
+    private String getFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/get_flash_led.php";
+    private String setFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/set_flash_led.php?flashLED=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,18 @@ public class SplashScreen extends AppCompatActivity {
 
         imageView = findViewById(R.id.live_video);
         requestQueue = Volley.newRequestQueue(this);
+
+        Switch flashLEDButton = findViewById(R.id.flash_led_toggle_button);
+        getFlashLEDFromServer(flashLEDButton);
+
+
+        flashLEDButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // Code to be executed when the switch button is checked or unchecked
+                setFlashLEDOnServer(isChecked);
+            }
+        });
 
         final Handler handler = new Handler();
         Timer timer = new Timer();
@@ -69,6 +84,30 @@ public class SplashScreen extends AppCompatActivity {
         };
         // Schedule the timer to run every 1 second
         timer.schedule(timerTask, 0, 2000);
+    }
+
+    private void getFlashLEDFromServer(Switch flashLEDButton) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getFlashLEDUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        boolean result = Boolean.parseBoolean(response);
+                        flashLEDButton.setChecked(result);
+                        // Handle the boolean value
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle the error
+            }
+        });
+        requestQueue.add(stringRequest);
+
+    }
+
+    private void setFlashLEDOnServer(boolean flashLED) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, setFlashLEDUrl+flashLED, null, null);
+        requestQueue.add(stringRequest);
     }
 
     private void getImageFromServer() {
