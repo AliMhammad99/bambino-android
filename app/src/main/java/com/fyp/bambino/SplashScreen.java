@@ -7,10 +7,13 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Base64;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -28,116 +31,96 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 public class SplashScreen extends AppCompatActivity {
 
-    FirebaseDatabase firebaseDatabase;
-    DatabaseReference databaseReference;
-
-    boolean prevRender = false;
+    private ImageView imageView;
+//    private SurfaceView surfaceView;
+    private Handler handler;
+    private boolean streaming = true;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+        // Get the SurfaceView component from the layout
+//        surfaceView = findViewById(R.id.surfaceView);
+imageView = findViewById(R.id.imageView);
+        // Create a Handler for updating the SurfaceView with the camera stream frames
+        handler = new Handler();
 
-        firebaseDatabase = FirebaseDatabase.getInstance();
-        databaseReference = firebaseDatabase.getReference();
-//        databaseReference.child("/FlashLED").setValue(true);
+        // Initialize the camera stream
+        startStream();
 
-        Switch flashLEDButton = findViewById(R.id.flash_led_toggle_button);
-        databaseReference.child("/FlashLED").get().addOnCompleteListener(new OnCompleteListener<DataSnapshot>() {
+    }
+
+    private void startStream() {
+        // Start a new thread for the camera stream
+        new Thread(new Runnable() {
             @Override
-            public void onComplete(@NonNull Task<DataSnapshot> task) {
-                if (!task.isSuccessful()) {
+            public void run() {
+                try {
+                    // Set up the HTTP connection to the ESP32-CAM camera web server
+                    URL url = new URL("http://192.168.43.239");
+                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                    connection.setRequestMethod("GET");
+                    connection.setDoInput(true);
+                    connection.connect();
+                    Log.i("Connected","....");
+                    // Get the input stream for the camera stream
+                    InputStream stream = connection.getInputStream();
 
-                    Log.e("firebase", "Error getting data", task.getException());
-                }
-                else {
-                    flashLEDButton.setChecked((boolean) task.getResult().getValue());
-//                    Log.d("firebase", String.valueOf(task.getResult().getValue()));
-                }
-            }
-        });
-
-
-
-        flashLEDButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                // Code to be executed when the switch button is checked or unchecked
-//                Log.i("FLASH:  ", String.valueOf(isChecked));
-                databaseReference.child("/FlashLED").setValue(isChecked);
-            }
-        });
-
-        ValueEventListener postListener = new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // Get Post object and use the values to update the UI
-                if(dataSnapshot.hasChild("c")){
-                    if(dataSnapshot.hasChild("uploading")){
-                        boolean render = !(boolean) dataSnapshot.child("uploading").getValue();
-                        Log.i("RENDER:   ", String.valueOf(render));
-                        if(render && !prevRender) {
-                            prevRender = true;
-                            Log.i("RENDER 1:   ", String.valueOf(render));
-                            renderToImageView(dataSnapshot);
-
-                        }
-                        if(!render){
-                            prevRender = false;
-                        }
+                    // Continuously read and display the camera stream frames
+                    while (streaming) {
+                        Log.i("Streaming:","....");
+                        Log.i("STREAM:   ", String.valueOf(stream));
+                        // Decode the next frame from the stream
+                        Bitmap frame = BitmapFactory.decodeStream(stream);
+                        imageView.setImageBitmap(frame);
+                        // Update the SurfaceView with the new frame
+//                        handler.post(new UpdateSurfaceView(frame));
                     }
+
+                    // Clean up the connection and input stream
+                    stream.close();
+                    connection.disconnect();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-//                Log.i("POST", String.valueOf(dataSnapshot.getValue()));
-
             }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                // Getting Post failed, log a message
-                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
-            }
-        };
-        databaseReference.addValueEventListener(postListener);
+        }).start();
     }
 
-    private void renderToImageView(DataSnapshot dataSnapshot) {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
-        for (long i = 0; i < (long)dataSnapshot.child("nbSubStrings").getValue(); i++) {
-            String base64Chunk = (String) dataSnapshot.child("c").child("p" + i).getValue();
-//            Log.i("DECODING: ", String.valueOf(i));
-//            Log.i("DECODING: ", (String) dataSnapshot.child("c").child("p" + i).getValue());
-            byte[] decodedBytes = Base64.decode(base64Chunk, Base64.DEFAULT);
-            try {
-                outputStream.write(decodedBytes);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        }
-        String base64Chunk = (String) dataSnapshot.child("c").child("pL").getValue();
-        byte[] decodedBytes = Base64.decode(base64Chunk, Base64.DEFAULT);
-        try {
-            outputStream.write(decodedBytes);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
-        byte fullDecodedBytes[] = outputStream.toByteArray();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(fullDecodedBytes, 0, fullDecodedBytes.length);
-
-        ImageView imageView = findViewById(R.id.live_video);
-
-        Matrix matrix = new Matrix();
-
-        matrix.postRotate(90);
-
-        Bitmap scaledBitmap = Bitmap.createScaledBitmap(bitmap, bitmap.getWidth(), bitmap.getHeight(), true);
-
-        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-
-        imageView.setImageBitmap(rotatedBitmap);
+    private void stopStream() {
+        // Stop the camera stream
+        streaming = false;
     }
+
+//    private class UpdateSurfaceView implements Runnable {
+//        private Bitmap frame;
+//
+//        public UpdateSurfaceView(Bitmap frame) {
+//            this.frame = frame;
+//        }
+//
+//        @Override
+//        public void run() {
+//            // Get the Canvas object from the SurfaceView's SurfaceHolder
+//            Canvas canvas = surfaceView.getHolder().lockCanvas();
+//
+//            if (canvas != null) {
+//                try {
+//                    // Draw the new frame onto the Canvas
+//                    canvas.drawBitmap(frame, 0, 0, null);
+//                } finally {
+//                    // Unlock the Canvas and update the SurfaceView
+//                    surfaceView.getHolder().unlockCanvasAndPost(canvas);
+//                }
+//            }
+//        }
+//    }
+
 }

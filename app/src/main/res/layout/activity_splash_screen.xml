@@ -6,14 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".SplashScreen">
 
+<!--    <SurfaceView-->
+<!--        android:id="@+id/surfaceView"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="match_parent" />-->
     <ImageView
-        android:id="@+id/live_video"
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
-
-    <Switch
-        android:id="@+id/flash_led_toggle_button"
-        android:layout_width="100dp"
-        android:layout_height="wrap_content"
-        android:text="Switch" />
+        android:layout_height="match_parent"/>
 </FrameLayout>
