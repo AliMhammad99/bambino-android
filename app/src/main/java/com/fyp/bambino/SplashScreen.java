@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Matrix;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -19,7 +20,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.MediaController;
 import android.widget.Switch;
+import android.widget.VideoView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -51,13 +54,19 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         // Get the SurfaceView component from the layout
 //        surfaceView = findViewById(R.id.surfaceView);
-        imageView = findViewById(R.id.imageView);
+        VideoView videoView = findViewById(R.id.video_view);
+        String videoUrl = "http://192.168.43.239:80";
+        videoView.setVideoURI(Uri.parse(videoUrl));
+        videoView.start();
+        MediaController mediaController = new MediaController(this);
+        mediaController.setAnchorView(videoView);
+        videoView.setMediaController(mediaController);
 //        WebView webView = (WebView) findViewById(R.id.webview);
 ////        myWebView.loadUrl("http://192.168.43.239/");
 //        webView.setWebViewClient(new WebViewClient()); // ensure links open in the same WebView
 //        webView.loadUrl("http://192.168.43.239:80");
 //        webView.getSettings().setJavaScriptEnabled(true); // enable JavaScript (required for some video players)
-        startStream();
+
     }
 
     private void startStream() {
