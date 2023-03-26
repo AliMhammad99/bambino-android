@@ -6,12 +6,11 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <LinearLayout
+    <FrameLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginVertical="20dp"
-        android:orientation="vertical"
+
+
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -21,17 +20,17 @@
             android:id="@+id/fragment_container_view"
             android:name="com.fyp.bambino.DashBoardFragment"
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="0.72"
+            android:layout_height="match_parent"
             tools:layout="@layout/fragment_dash_board" />
 
 
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_gravity="center"
-            android:layout_marginTop="20dp"
-            android:layout_weight="0.08"
+            android:layout_height="75dp"
+            android:layout_gravity="bottom"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginVertical="20dp"
+
             android:background="@drawable/slc_nav"
             android:gravity="center"
             android:orientation="horizontal">
@@ -69,14 +68,5 @@
 
         </LinearLayout>
 
-        <!--        <ImageButton-->
-        <!--            android:id="@+id/btn_dashboar"-->
-        <!--            android:layout_width="80dp"-->
-        <!--            android:layout_height="80dp"-->
-
-        <!--            android:backgroundTint="#00000000"-->
-        <!--            android:scaleType="centerInside"-->
-        <!--            android:src="@drawable/ic_live_video"-->
-        <!--            android:tooltipText="Dashboard" />-->
-    </LinearLayout>
+    </FrameLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
