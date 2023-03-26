@@ -11,9 +11,12 @@ import android.graphics.Canvas;
 import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Base64;
 import android.util.Log;
 import android.view.SurfaceView;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.Switch;
@@ -48,12 +51,11 @@ public class SplashScreen extends AppCompatActivity {
         setContentView(R.layout.activity_splash_screen);
         // Get the SurfaceView component from the layout
 //        surfaceView = findViewById(R.id.surfaceView);
-imageView = findViewById(R.id.imageView);
-        // Create a Handler for updating the SurfaceView with the camera stream frames
-        handler = new Handler();
-
-        // Initialize the camera stream
-        startStream();
+        WebView webView = (WebView) findViewById(R.id.webview);
+//        myWebView.loadUrl("http://192.168.43.239/");
+        webView.setWebViewClient(new WebViewClient()); // ensure links open in the same WebView
+        webView.loadUrl("http://192.168.43.239:80");
+        webView.getSettings().setJavaScriptEnabled(true); // enable JavaScript (required for some video players)
 
     }
 
