@@ -12,7 +12,7 @@
         android:fontFamily="@font/gotham_bold"
         android:text="Configuration"
         android:textColor="@color/gray"
-        android:textSize="35sp"
+        android:textSize="30sp"
         android:layout_margin="20dp"
         android:textStyle="bold" />
 

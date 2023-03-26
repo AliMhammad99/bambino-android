@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -38,6 +39,8 @@ public class LiveVideoFragment extends Fragment {
     private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
     private String getFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/get_flash_led.php";
     private String setFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/set_flash_led.php?flashLED=";
+
+    private ProgressBar progressBar;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -86,6 +89,8 @@ public class LiveVideoFragment extends Fragment {
         imageView = rootView.findViewById(R.id.live_video);
         requestQueue = Volley.newRequestQueue(this.getContext());
 
+        progressBar = rootView.findViewById(R.id.progressBar);
+
         final Handler handler = new Handler();
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -124,6 +129,7 @@ public class LiveVideoFragment extends Fragment {
                 new Response.Listener<Bitmap>() {
                     @Override
                     public void onResponse(Bitmap responseBitmap) {
+
                         Matrix matrix = new Matrix();
 
                         matrix.postRotate(90);
@@ -131,7 +137,7 @@ public class LiveVideoFragment extends Fragment {
                         Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
 
                         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-
+                        progressBar.setVisibility(View.GONE);
                         imageView.setImageBitmap(rotatedBitmap);
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
