@@ -32,74 +32,75 @@ import com.google.firebase.database.ValueEventListener;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class SplashScreen extends AppCompatActivity {
 
     private ImageView imageView;
-//    private SurfaceView surfaceView;
-    private Handler handler;
-    private boolean streaming = true;
+    private OkHttpClient client;
+    private Request request;
+    private String url;
+    private String partBoundary = "123456789000000000000987654321";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash_screen);
+        imageView = findViewById(R.id.imageView);
         // Get the SurfaceView component from the layout
-//        surfaceView = findViewById(R.id.surfaceView);
-        WebView webView = (WebView) findViewById(R.id.webview);
-//        myWebView.loadUrl("http://192.168.43.239/");
-        webView.setWebViewClient(new WebViewClient()); // ensure links open in the same WebView
-        webView.loadUrl("http://192.168.43.239:80");
-        webView.getSettings().setJavaScriptEnabled(true); // enable JavaScript (required for some video players)
-
-    }
-
-    private void startStream() {
-        // Start a new thread for the camera stream
-        new Thread(new Runnable() {
+        client = new OkHttpClient();
+        url = "http://192.168.43.239/";
+        request = new Request.Builder()
+                .url(url)
+                .addHeader("Content-Type", "multipart/x-mixed-replace;boundary=" + partBoundary)
+                .build();
+        Callback callback = new Callback() {
             @Override
-            public void run() {
-                try {
-                    // Set up the HTTP connection to the ESP32-CAM camera web server
-                    URL url = new URL("http://192.168.43.239");
-                    HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                    connection.setRequestMethod("GET");
-                    connection.setDoInput(true);
-                    connection.connect();
-                    Log.i("Connected","....");
-                    // Get the input stream for the camera stream
-                    InputStream stream = connection.getInputStream();
+            public void onFailure(Call call, IOException e) {
+                e.printStackTrace();
+            }
 
-                    // Continuously read and display the camera stream frames
-                    while (streaming) {
-                        Log.i("Streaming:","....");
-                        Log.i("STREAM:   ", String.valueOf(stream));
-                        // Decode the next frame from the stream
-                        Bitmap frame = BitmapFactory.decodeStream(stream);
-                        imageView.setImageBitmap(frame);
-                        // Update the SurfaceView with the new frame
-//                        handler.post(new UpdateSurfaceView(frame));
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                if (!response.isSuccessful()) {
+                    throw new IOException("Unexpected code " + response);
+                }
+
+                // Parse the response and update the ImageView
+                InputStream inputStream = response.body().byteStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.startsWith("--" + partBoundary)) {
+                        // Extract the image data and update the ImageView
+                        Bitmap bitmap = BitmapFactory.decodeStream(inputStream);
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                imageView.setImageBitmap(bitmap);
+                            }
+                        });
                     }
-
-                    // Clean up the connection and input stream
-                    stream.close();
-                    connection.disconnect();
-                } catch (Exception e) {
-                    e.printStackTrace();
                 }
             }
-        }).start();
+        };
+
+// Start the HTTP request to receive the streamed images
+        client.newCall(request).enqueue(callback);
     }
 
-    private void stopStream() {
-        // Stop the camera stream
-        streaming = false;
-    }
 
 //    private class UpdateSurfaceView implements Runnable {
 //        private Bitmap frame;
