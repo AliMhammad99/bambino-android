@@ -1,5 +1,7 @@
 package com.fyp.bambino;
 
+import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
@@ -9,6 +11,17 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.Toast;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.Volley;
+
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -16,9 +29,15 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class LiveVideoFragment extends Fragment {
-    private Handler handler;
-    private Runnable runnable;
+//    private Handler handler;
+//    private Runnable runnable;
 
+
+    private ImageView imageView;
+    private RequestQueue requestQueue;
+    private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
+    private String getFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/get_flash_led.php";
+    private String setFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/set_flash_led.php?flashLED=";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -63,27 +82,72 @@ public class LiveVideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Create the handler and runnable for the repeating task
-        handler = new Handler();
-        runnable = new Runnable() {
+        View rootView = inflater.inflate(R.layout.fragment_live_video, container, false);
+        imageView = rootView.findViewById(R.id.live_video);
+        requestQueue = Volley.newRequestQueue(this.getContext());
+
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+        TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
-                Log.d("MyFragment", "Hello, world!");
-                handler.postDelayed(this, 1000);
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Call your PHP server here
+                        getImageFromServer();
+                    }
+                });
             }
         };
+        // Schedule the timer to run every 1 second
+        timer.schedule(timerTask, 0, 2000);
 
-        // Start the repeating task
-        handler.postDelayed(runnable, 1000);
+        // Create the handler and runnable for the repeating task
+//        handler = new Handler();
+//        runnable = new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.d("MyFragment", "Hello, world!");
+//                handler.postDelayed(this, 1000);
+//            }
+//        };
+//
+//        // Start the repeating task
+//        handler.postDelayed(runnable, 1000);
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_live_video, container, false);
+        return rootView;
 
     }
+    private void getImageFromServer() {
+        ImageRequest imageRequest = new ImageRequest(imageUrl,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap responseBitmap) {
+                        Matrix matrix = new Matrix();
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        // Stop the repeating task when the fragment is no longer visible
-        handler.removeCallbacks(runnable);
+                        matrix.postRotate(90);
+
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+
+                        imageView.setImageBitmap(rotatedBitmap);
+                    }
+                }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        Toast.makeText(getActivity(), "Error retrieving image", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+        requestQueue.add(imageRequest);
     }
+//    @Override
+//    public void onPause() {
+//        super.onPause();
+//        // Stop the repeating task when the fragment is no longer visible
+//        handler.removeCallbacks(runnable);
+//    }
 }

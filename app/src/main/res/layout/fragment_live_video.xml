@@ -18,10 +18,10 @@
         android:textStyle="bold" />
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/live_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:src="@drawable/image"
+
 
         />
 
