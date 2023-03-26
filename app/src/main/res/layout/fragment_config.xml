@@ -8,7 +8,12 @@
     <!-- TODO: Update blank fragment layout -->
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Config" />
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/gotham_bold"
+        android:text="Configuration"
+        android:textColor="@color/gray"
+        android:textSize="35sp"
+        android:layout_margin="20dp"
+        android:textStyle="bold" />
 
 </FrameLayout>
