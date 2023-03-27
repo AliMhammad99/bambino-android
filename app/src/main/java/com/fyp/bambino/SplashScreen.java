@@ -62,7 +62,9 @@ public class SplashScreen extends AppCompatActivity {
 
     private final int ID_CONNECT = 200;
     private final int ID_FLASH = 201;
-    private final int ID_RSSI = 202;
+
+    private boolean flashOn = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -72,7 +74,22 @@ public class SplashScreen extends AppCompatActivity {
         stream_thread = new HandlerThread("http");
         stream_thread.start();
         stream_handler = new HttpHandler(stream_thread.getLooper());
+
+        //This line will start the stream
         stream_handler.sendEmptyMessage(ID_CONNECT);
+
+        flash_thread = new HandlerThread("http");
+        flash_thread.start();
+        flash_handler = new HttpHandler(flash_thread.getLooper());
+
+        Switch flashLEDSwitch = findViewById(R.id.flash_led_switch);
+        flashLEDSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                flash_handler.sendEmptyMessage(ID_FLASH);
+            }
+        });
+
     }
 
 //    @Override
@@ -106,9 +123,9 @@ public class SplashScreen extends AppCompatActivity {
                 case ID_CONNECT:
                     VideoStream();
                     break;
-//                case ID_FLASH:
-//                    SetFlash();
-//                    break;
+                case ID_FLASH:
+                    SetFlash();
+                    break;
 //                case ID_RSSI:
 //                    GetRSSI();
 //                    break;
@@ -169,14 +186,19 @@ public class SplashScreen extends AppCompatActivity {
 
                             Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
 
-                            final Bitmap bitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                            final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                            Matrix matrix = new Matrix();
 
+                            matrix.postRotate(90);
+                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
                             runOnUiThread(new Runnable()
                             {
                                 @Override
                                 public void run()
                                 {
-                                    imageView.setImageBitmap(bitmap);
+                                    imageView.setImageBitmap(rotatedBitmap);
                                 }
                             });
 
@@ -227,5 +249,44 @@ public class SplashScreen extends AppCompatActivity {
         {
             e.printStackTrace();
         }
+    }
+
+    private void SetFlash()
+    {
+        flash_thread.suspend();
+        flashOn ^= true;
+
+        String flash_url;
+        if(flashOn){
+            flash_url = "http://192.168.43.239:80/flash_on";
+        }
+        else {
+            flash_url = "http://192.168.43.239:80/flash_off";
+        }
+
+        try
+        {
+
+            URL url = new URL(flash_url);
+
+            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+            huc.setRequestMethod("GET");
+            huc.setConnectTimeout(1000 * 5);
+            huc.setReadTimeout(1000 * 5);
+            huc.setDoInput(true);
+            huc.connect();
+            if (huc.getResponseCode() == 200)
+            {
+                InputStream in = huc.getInputStream();
+
+                InputStreamReader isr = new InputStreamReader(in);
+                BufferedReader br = new BufferedReader(isr);
+            }
+
+        } catch (Exception e)
+        {
+            e.printStackTrace();
+        }
+        flash_thread.resume();
     }
 }
