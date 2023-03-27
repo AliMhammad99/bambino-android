@@ -1,6 +1,7 @@
 package com.fyp.bambino;
 
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
 
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.volley.RequestQueue;
@@ -34,6 +36,7 @@ public class LiveVideoFragment extends Fragment {
 //    private Runnable runnable;
 
 
+    private TextView headerTextView;
     private ImageView imageView;
     private RequestQueue requestQueue;
     private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
@@ -86,6 +89,8 @@ public class LiveVideoFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_live_video, container, false);
+
+        headerTextView = rootView.findViewById(R.id.header_text_view);
         imageView = rootView.findViewById(R.id.live_video);
         requestQueue = Volley.newRequestQueue(this.getContext());
 
@@ -138,7 +143,9 @@ public class LiveVideoFragment extends Fragment {
 
                         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
                         progressBar.setVisibility(View.GONE);
+
                         imageView.setImageBitmap(rotatedBitmap);
+                        headerTextView.setTextColor(Color.WHITE);
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
                 new Response.ErrorListener() {
