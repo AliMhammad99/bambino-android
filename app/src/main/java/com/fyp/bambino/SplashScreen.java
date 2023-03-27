@@ -57,13 +57,16 @@ import okhttp3.Response;
 public class SplashScreen extends AppCompatActivity {
 
     private ImageView imageView;
-    private HandlerThread stream_thread,flash_thread,rssi_thread;
-    private Handler stream_handler,flash_handler,rssi_handler;
+    private HandlerThread stream_thread, flash_thread, rssi_thread;
+    private Handler stream_handler, flash_handler, rssi_handler;
 
     private final int ID_CONNECT = 200;
     private final int ID_FLASH = 201;
 
     private boolean flashOn = false;
+
+    private boolean isStreaming = true;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,13 +89,16 @@ public class SplashScreen extends AppCompatActivity {
         flashLEDSwitch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean b) {
+                isStreaming = !isStreaming;
+
+                Log.i("1. Streaming:  ", String.valueOf(isStreaming));
                 flash_handler.sendEmptyMessage(ID_FLASH);
             }
         });
 
     }
 
-//    @Override
+    //    @Override
 //    public void onClick(View v)
 //    {
 //        switch (v.getId())
@@ -108,18 +114,14 @@ public class SplashScreen extends AppCompatActivity {
 //                break;
 //        }
 //    }
-    private class HttpHandler extends Handler
-    {
-        public HttpHandler(Looper looper)
-        {
+    private class HttpHandler extends Handler {
+        public HttpHandler(Looper looper) {
             super(looper);
         }
 
         @Override
-        public void handleMessage(Message msg)
-        {
-            switch (msg.what)
-            {
+        public void handleMessage(Message msg) {
+            switch (msg.what) {
                 case ID_CONNECT:
                     VideoStream();
                     break;
@@ -135,137 +137,121 @@ public class SplashScreen extends AppCompatActivity {
         }
     }
 
-    private void VideoStream()
-    {
-        String stream_url = "http://192.168.43.239:80";
+    private void VideoStream() {
+        Log.i("2.0. Streaming:  ", String.valueOf(isStreaming));
+        if (isStreaming) {
 
-        BufferedInputStream bis = null;
-        FileOutputStream fos = null;
-        try
-        {
+            String stream_url = "http://192.168.43.239:80";
+            Log.i("2. Streaming:  ", String.valueOf(isStreaming));
 
-            URL url = new URL(stream_url);
+            BufferedInputStream bis = null;
+            FileOutputStream fos = null;
+            try {
 
-            try
-            {
-                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                huc.setRequestMethod("GET");
-                huc.setConnectTimeout(1000 * 5);
-                huc.setReadTimeout(1000 * 5);
-                huc.setDoInput(true);
-                huc.connect();
+                URL url = new URL(stream_url);
 
-                if (huc.getResponseCode() == 200)
-                {
-                    InputStream in = huc.getInputStream();
+                try {
+                    HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                    huc.setRequestMethod("GET");
+                    huc.setConnectTimeout(1000 * 5);
+                    huc.setReadTimeout(1000 * 5);
+                    huc.setDoInput(true);
+                    huc.connect();
 
-                    InputStreamReader isr = new InputStreamReader(in);
-                    BufferedReader br = new BufferedReader(isr);
+                    if (huc.getResponseCode() == 200) {
+                        InputStream in = huc.getInputStream();
 
-                    String data;
+                        InputStreamReader isr = new InputStreamReader(in);
+                        BufferedReader br = new BufferedReader(isr);
 
-                    int len;
-                    byte[] buffer;
+                        String data;
 
-                    while ((data = br.readLine()) != null)
-                    {
-                        if (data.contains("Content-Type:"))
-                        {
-                            data = br.readLine();
+                        int len;
+                        byte[] buffer;
 
-                            len = Integer.parseInt(data.split(":")[1].trim());
+                        while ((data = br.readLine()) != null) {
+                            if (data.contains("Content-Type:")) {
+                                data = br.readLine();
 
-                            bis = new BufferedInputStream(in);
-                            buffer = new byte[len];
+                                len = Integer.parseInt(data.split(":")[1].trim());
 
-                            int t = 0;
-                            while (t < len)
-                            {
-                                t += bis.read(buffer, t, len - t);
+                                bis = new BufferedInputStream(in);
+                                buffer = new byte[len];
+
+                                int t = 0;
+                                while (t < len) {
+                                    t += bis.read(buffer, t, len - t);
+                                }
+
+                                Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+
+                                final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                                Matrix matrix = new Matrix();
+
+                                matrix.postRotate(90);
+                                Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                                Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                                runOnUiThread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        imageView.setImageBitmap(rotatedBitmap);
+                                    }
+                                });
+
                             }
 
-                            Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-
-                            final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-                            Matrix matrix = new Matrix();
-
-                            matrix.postRotate(90);
-                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-
-                            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                            runOnUiThread(new Runnable()
-                            {
-                                @Override
-                                public void run()
-                                {
-                                    imageView.setImageBitmap(rotatedBitmap);
-                                }
-                            });
 
                         }
-
-
                     }
-                }
 
-            } catch (IOException e)
-            {
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            } catch (MalformedURLException e) {
                 e.printStackTrace();
-            }
-        } catch (MalformedURLException e)
-        {
-            e.printStackTrace();
-        } finally
-        {
-            try
-            {
-                if (bis != null)
-                {
-                    bis.close();
-                }
-                if (fos != null)
-                {
-                    fos.close();
-                }
+            } finally {
+                try {
+                    if (bis != null) {
+                        bis.close();
+                    }
+                    if (fos != null) {
+                        fos.close();
+                    }
 
-                stream_handler.sendEmptyMessageDelayed(ID_CONNECT,3000);
-            } catch (IOException e)
-            {
-                e.printStackTrace();
+//                if (isStreaming)
+//                    stream_handler.sendEmptyMessageDelayed(ID_CONNECT, 3000);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
-
     }
-    private void Bytes2ImageFile(byte[] bytes, String fileName)
-    {
-        try
-        {
+
+    private void Bytes2ImageFile(byte[] bytes, String fileName) {
+        try {
             File file = new File(fileName);
             FileOutputStream fos = new FileOutputStream(file);
             fos.write(bytes, 0, bytes.length);
             fos.flush();
             fos.close();
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void SetFlash()
-    {
-        flash_thread.suspend();
+    private void SetFlash() {
+
         flashOn ^= true;
 
         String flash_url;
-        if(flashOn){
+        if (flashOn) {
             flash_url = "http://192.168.43.239:80/flash_on";
-        }
-        else {
+        } else {
             flash_url = "http://192.168.43.239:80/flash_off";
         }
 
-        try
-        {
+        try {
 
             URL url = new URL(flash_url);
 
@@ -275,18 +261,15 @@ public class SplashScreen extends AppCompatActivity {
             huc.setReadTimeout(1000 * 5);
             huc.setDoInput(true);
             huc.connect();
-            if (huc.getResponseCode() == 200)
-            {
+            if (huc.getResponseCode() == 200) {
                 InputStream in = huc.getInputStream();
 
                 InputStreamReader isr = new InputStreamReader(in);
                 BufferedReader br = new BufferedReader(isr);
             }
 
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        flash_thread.resume();
     }
 }
