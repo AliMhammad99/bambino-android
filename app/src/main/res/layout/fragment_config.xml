@@ -5,15 +5,76 @@
     android:layout_height="match_parent"
     tools:context=".ConfigFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/gotham_bold"
-        android:text="Configuration"
-        android:textColor="@color/gray"
-        android:textSize="30sp"
-        android:layout_margin="20dp"
-        android:textStyle="bold" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+
+            android:layout_margin="20dp"
+            android:fontFamily="@font/gotham_bold"
+            android:text="Configuration"
+            android:textColor="@color/gray"
+            android:textSize="30sp"
+            android:textStyle="bold" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:contentDescription="Scroll horizontally to view more content"
+
+            >
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="115dp">
+
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="15dp"
+                    android:breakStrategy="simple"
+                    android:fontFamily="@font/gotham_medium"
+                    android:textColor="@color/gray"
+                    android:hyphenationFrequency="normal"
+                    android:text="Please choose you bambino device to pair. If you can't see it here press the reset button on the device. Blinking red light means it is waiting for pairing. It will wait for 30 seconds only."
+                    android:textSize="17sp" />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center_vertical"
+                    >
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="match_parent"
+                        android:src="@drawable/ic_bluetooth"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="5dp"/>
+
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:breakStrategy="simple"
+                        android:fontFamily="@font/gotham_medium"
+                        android:hyphenationFrequency="normal"
+                        android:text="Available Devices"
+                        android:textColor="@color/gray"
+                        android:textSize="25sp"
+                        android:layout_gravity="center_vertical"/>
+                </LinearLayout>
+
+
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
 </FrameLayout>
