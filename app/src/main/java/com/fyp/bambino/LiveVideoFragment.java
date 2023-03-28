@@ -111,7 +111,7 @@ public class LiveVideoFragment extends Fragment {
             }
         };
         // Schedule the timer to run every 1 second
-        timer.schedule(timerTask, 0, 2000);
+        timer.schedule(timerTask, 0, 1000);
 
         // Create the handler and runnable for the repeating task
 //        handler = new Handler();
