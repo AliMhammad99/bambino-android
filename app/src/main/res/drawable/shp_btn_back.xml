@@ -7,8 +7,8 @@
         android:centerColor="#FFB19F"
         android:endColor="#00CCFF"
         android:startColor="#E36ABA"
-        android:type="linear" />
-    <size
-        android:width="100dp"
-        android:height="20dp" />
+        android:type="linear"
+
+        />
+
 </shape>

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -48,9 +49,10 @@
                     android:textSize="17sp" />
 
                 <LinearLayout
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:gravity="center_vertical">
+
+                    android:orientation="horizontal">
 
                     <ImageView
                         android:layout_width="20dp"
@@ -61,15 +63,25 @@
 
 
                     <TextView
-                        android:layout_width="match_parent"
+                        android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:layout_weight="1"
                         android:breakStrategy="simple"
                         android:fontFamily="@font/gotham_medium"
                         android:hyphenationFrequency="normal"
                         android:text="Available Devices"
                         android:textColor="@color/gray"
                         android:textSize="25sp" />
+
+                    <ImageButton
+                        android:layout_width="50dp"
+                        android:layout_height="50dp"
+                        android:layout_gravity="end"
+                        android:backgroundTint="#00000000"
+                        android:foreground="?attr/selectableItemBackgroundBorderless"
+                        android:scaleType="centerInside"
+                        android:src="@drawable/ic_refresh" />
                 </LinearLayout>
 
                 <ScrollView
@@ -110,12 +122,14 @@
                             android:layout_height="wrap_content"
                             android:text="Option 3"
                             android:textSize="20sp" />
+
                         <RadioButton
                             android:id="@+id/radio_button_5"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Option 3"
                             android:textSize="20sp" />
+
                         <RadioButton
                             android:id="@+id/radio_button_6"
                             android:layout_width="wrap_content"
@@ -128,10 +142,14 @@
                 <Button
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
-                    android:text="Next"
+                    android:background="@drawable/shp_btn_back"
                     android:fontFamily="@font/gotham_bold"
+                    android:foreground="@drawable/rpl_btn_back"
+                    android:stateListAnimator="@null"
+                    android:text="Next"
                     android:textSize="23sp"
-                    android:background="@drawable/shape_button_background"/>
+                    app:backgroundTint="@null"
+                    android:layout_gravity="end"/>
             </LinearLayout>
         </ScrollView>
     </LinearLayout>
