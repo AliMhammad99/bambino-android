@@ -1,7 +1,16 @@
 package com.fyp.bambino;
 
+import static androidx.core.content.ContextCompat.getSystemService;
+
+import android.app.Activity;
+import android.bluetooth.BluetoothAdapter;
+import android.bluetooth.BluetoothManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -56,9 +65,35 @@ public class ConfigFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_config, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_config, container, false);
+        BluetoothManager bluetoothManager = (BluetoothManager) getActivity().getSystemService(BluetoothManager.class);
+        BluetoothAdapter bluetoothAdapter = bluetoothManager.getAdapter();
+        if (bluetoothAdapter == null) {
+            getActivity().finish();
+        }
+        if (!bluetoothAdapter.isEnabled()) {
+            // Create an intent to enable Bluetooth
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+
+            // Register an activity result callback for the Bluetooth enable request
+            ActivityResultLauncher<Intent> enableBtLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    // Bluetooth was enabled successfully
+                    // Your code here
+
+                } else {
+                    // Bluetooth was not enabled
+                    // Your code here
+                    getActivity().finish();
+                }
+            });
+
+// Launch the Bluetooth enable request activity
+            enableBtLauncher.launch(enableBtIntent);
+        }
+        return rootView;
+
     }
 }
