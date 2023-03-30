@@ -12,7 +12,7 @@
         android:fontFamily="@font/gotham_bold"
         android:text="Dashboard"
         android:textColor="@color/gray"
-        android:textSize="30sp"
+        android:textSize="28sp"
         android:layout_margin="20dp"
         android:textStyle="bold" />
 

@@ -10,13 +10,14 @@
 
 
     <ImageView
-        android:layout_gravity="center"
         android:id="@+id/live_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_gravity="center"
         android:scaleType="fitStart"
 
         />
+
     <TextView
         android:id="@+id/header_text_view"
         android:layout_width="match_parent"
@@ -26,16 +27,16 @@
         android:text="Live Video"
 
         android:textColor="@color/gray"
-        android:textSize="30sp"
+        android:textSize="28sp"
         android:textStyle="bold" />
+
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyle"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleX="0.15"
-        android:scaleY="0.15"
-        />
+        android:scaleY="0.15" />
 
 
 </FrameLayout>

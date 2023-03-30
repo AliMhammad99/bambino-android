@@ -1,156 +1,274 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context=".ConfigFragment">
 
-    <LinearLayout
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_margin="20dp"
+        android:fontFamily="@font/gotham_bold"
+        android:text="Configuration"
+        android:textColor="@color/gray"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:contentDescription="Scroll horizontally to view more content"
 
-        <TextView
+        >
+
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="115dp">
 
-            android:layout_margin="20dp"
-            android:fontFamily="@font/gotham_bold"
-            android:text="Configuration"
-            android:textColor="@color/gray"
-            android:textSize="30sp"
-            android:textStyle="bold" />
 
-        <ScrollView
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:contentDescription="Scroll horizontally to view more content"
-
-            >
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:breakStrategy="simple"
+                android:fontFamily="@font/gotham_book"
+                android:hyphenationFrequency="normal"
+                android:lineSpacingExtra="7dp"
+                android:text="Please choose your Bambino device to pair. If you can't see it here press the reset button on the device. Blinking red light means it is waiting for pairing. It will wait for 30 seconds only."
+                android:textColor="@color/gray"
+                android:textSize="17sp" />
 
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingHorizontal="20dp"
-                android:paddingBottom="115dp">
+                android:layout_height="match_parent"
+
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="5dp"
+                    android:src="@drawable/ic_bluetooth" />
 
 
                 <TextView
-                    android:layout_width="match_parent"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="15dp"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
                     android:breakStrategy="simple"
                     android:fontFamily="@font/gotham_medium"
                     android:hyphenationFrequency="normal"
-                    android:text="Please choose you bambino device to pair. If you can't see it here press the reset button on the device. Blinking red light means it is waiting for pairing. It will wait for 30 seconds only."
+                    android:text="Available Devices"
                     android:textColor="@color/gray"
-                    android:textSize="17sp" />
+                    android:textSize="22sp" />
 
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
+                <ImageButton
+                    android:id="btn_refresh"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end"
+                    android:backgroundTint="#00000000"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_refresh" />
+            </LinearLayout>
 
-                    android:orientation="horizontal">
-
-                    <ImageView
-                        android:layout_width="20dp"
-                        android:layout_height="match_parent"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginRight="5dp"
-                        android:src="@drawable/ic_bluetooth" />
-
-
-                    <TextView
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_weight="1"
-                        android:breakStrategy="simple"
-                        android:fontFamily="@font/gotham_medium"
-                        android:hyphenationFrequency="normal"
-                        android:text="Available Devices"
-                        android:textColor="@color/gray"
-                        android:textSize="25sp" />
-
-                    <ImageButton
-                        android:layout_width="50dp"
-                        android:layout_height="50dp"
-                        android:layout_gravity="end"
-                        android:backgroundTint="#00000000"
-                        android:foreground="?attr/selectableItemBackgroundBorderless"
-                        android:scaleType="centerInside"
-                        android:src="@drawable/ic_refresh" />
-                </LinearLayout>
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="230dp">
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="240dp">
+                    android:layout_height="160dp"
+                    android:scrollbarThumbVertical="@color/beige">
 
                     <RadioGroup
-                        android:id="@+id/radio_group"
+                        android:id="@+id/radio_group_bluetooth"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="10dp"
+
                         android:paddingLeft="12dp">
 
                         <RadioButton
-                            android:id="@+id/radio_button_1"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
                             android:text="Option 1"
+                            android:textColor="@color/gray"
+
                             android:textSize="20sp" />
 
                         <RadioButton
-                            android:id="@+id/radio_button_2"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Option 2"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
                             android:textSize="20sp" />
 
                         <RadioButton
-                            android:id="@+id/radio_button_3"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Option 3"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
                             android:textSize="20sp" />
 
                         <RadioButton
-                            android:id="@+id/radio_button_4"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Option 3"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
                             android:textSize="20sp" />
 
                         <RadioButton
-                            android:id="@+id/radio_button_5"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Option 3"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
                             android:textSize="20sp" />
 
                         <RadioButton
-                            android:id="@+id/radio_button_6"
+
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Option 3"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
                             android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
+                        <RadioButton
+
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:buttonTint="@color/beige"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="Option 1"
+                            android:textColor="@color/gray"
+
+                            android:textSize="20sp" />
+
                     </RadioGroup>
                 </ScrollView>
 
                 <Button
-                    android:layout_width="match_parent"
-                    android:layout_height="70dp"
+                    android:id="btn_next"
+                    android:layout_width="140dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom|right"
                     android:background="@drawable/shp_btn_back"
                     android:fontFamily="@font/gotham_bold"
                     android:foreground="@drawable/rpl_btn_back"
                     android:stateListAnimator="@null"
                     android:text="Next"
                     android:textSize="23sp"
-                    app:backgroundTint="@null"
-                    android:layout_gravity="end"/>
-            </LinearLayout>
-        </ScrollView>
-    </LinearLayout>
-</FrameLayout>
+                    app:backgroundTint="@null" />
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
