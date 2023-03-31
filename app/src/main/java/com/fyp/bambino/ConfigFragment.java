@@ -61,6 +61,7 @@ public class ConfigFragment extends Fragment {
 
     private static final int BLUETOOTH_CONNECT_REQUEST_CODE = 1;
     private static final int COARSE_LOCATION_REQUEST_CODE = 2;
+    private static final int BLUETOOTH_SCAN_REQUEST_CODE = 3;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -111,6 +112,7 @@ public class ConfigFragment extends Fragment {
 
         initUI(rootView);
         requestLocationPermission();
+//        requestBlueToothScanPermission();
         setUpBluetooth();
         turnOnBluetooth();
         registerBluetoothStateReceiver();
@@ -130,10 +132,51 @@ public class ConfigFragment extends Fragment {
     }
 
     private void requestLocationPermission() {
-        if (ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Log.i("LOCATION ", "GRANTED");
-            ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, COARSE_LOCATION_REQUEST_CODE);
+        ActivityResultLauncher<String> requestPermissionLauncher =
+                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+                    if (isGranted) {
+                        // Permission granted, do your work here
+                        Log.i("GRANTED NOW!!!!!!!", "");
+                    } else {
+                        // Permission denied, handle the case accordingly
+                        closeApp();
+                    }
+                });
+//        requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
+        requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
+    }
+
+    private void requestBlueToothScanPermission() {
+//        ActivityResultLauncher<String> requestPermissionLauncher =
+//                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+//                    if (isGranted) {
+//                        // Permission granted, do your work here
+//                        Log.i("GRANTED NOW!!!!!!!", "");
+//                    } else {
+//                        // Permission denied, handle the case accordingly
+//                        closeApp();
+//                    }
+//                });
+//        requestPermissionLauncher.launch(BluetoothAdapter.EXTRA_SCAN_MODE);
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            closeApp();
         }
+        bluetoothAdapter.startDiscovery();
+        BroadcastReceiver receiver = new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String action = intent.getAction();
+
+                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                    // A new Bluetooth device has been discovered
+                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                    // Do something with the device
+                }
+            }
+        };
+
+        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        this.getActivity().registerReceiver(receiver, filter);
     }
 
     private void setUpBluetooth() {
@@ -153,6 +196,8 @@ public class ConfigFragment extends Fragment {
                     //Allow pressed
                     getPairedBluetoothDevices();
                     hideProgressBar();
+                    requestBlueToothScanPermission();
+
                 } else {
                     //Deny pressed -> close the app
                     closeApp();
@@ -163,6 +208,7 @@ public class ConfigFragment extends Fragment {
             //Bluetooth already turned On
             getPairedBluetoothDevices();
             hideProgressBar();
+            requestBlueToothScanPermission();
         }
     }
 
@@ -213,6 +259,15 @@ public class ConfigFragment extends Fragment {
                     Log.i("LOCATION DENIED ", "");
                     // permission denied, you cannot access the coarse location
                     closeApp();
+                }
+            }
+            case BLUETOOTH_SCAN_REQUEST_CODE:{
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // Permission has been granted
+                    Log.i("HELLO SCAN","");
+                } else {
+                    Log.i("NOT HELLO SCAN","");
+                    // Permission has been denied
                 }
             }
             default: {
