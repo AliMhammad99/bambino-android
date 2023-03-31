@@ -101,9 +101,14 @@
                             android:id="@+id/loader_scan"
                             style="?android:attr/progressBarStyle"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-
+                            android:layout_height="150dp"
+                            android:scaleX="0.4"
+                            android:scaleY="0.4"
                             android:indeterminateTint="@color/beige"/>
+<!--                        <TextView-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="match_parent"-->
+<!--                            android:text="Bluetooth is Turned Off"/>-->
 <!--                        <RadioButton-->
 
 <!--                            android:layout_width="wrap_content"-->
