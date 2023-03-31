@@ -60,6 +60,7 @@ public class ConfigFragment extends Fragment {
     private Set<BluetoothDevice> pairedDevices;
 
     private static final int BLUETOOTH_CONNECT_REQUEST_CODE = 1;
+    private static final int COARSE_LOCATION_REQUEST_CODE = 2;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -107,12 +108,14 @@ public class ConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_config, container, false);
+
         initUI(rootView);
+        requestLocationPermission();
         setUpBluetooth();
         turnOnBluetooth();
+        registerBluetoothStateReceiver();
 
         return rootView;
-
     }
 
     @Override
@@ -126,12 +129,19 @@ public class ConfigFragment extends Fragment {
         this.bluetoothDevicesRadioGroup = view.findViewById(R.id.radio_group_bluetooth);
     }
 
+    private void requestLocationPermission() {
+        if (ContextCompat.checkSelfPermission(this.getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Log.i("LOCATION ", "GRANTED");
+            ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, COARSE_LOCATION_REQUEST_CODE);
+        }
+    }
+
     private void setUpBluetooth() {
         this.bluetoothManager = this.getActivity().getSystemService(BluetoothManager.class);
         this.bluetoothAdapter = this.bluetoothManager.getAdapter();
         if (this.bluetoothAdapter == null) {
             //Device does not support Bluetooth -> Close the app
-            this.getActivity().finish();
+            closeApp();
         }
     }
 
@@ -145,7 +155,7 @@ public class ConfigFragment extends Fragment {
                     hideProgressBar();
                 } else {
                     //Deny pressed -> close the app
-                    this.getActivity().finish();
+                    closeApp();
                 }
             });
             enableBtLauncher.launch(enableBTIntent);
@@ -168,7 +178,7 @@ public class ConfigFragment extends Fragment {
                 radioButton.setText(device.getName()); // or device.getAddress() depending on what you want to display
                 radioButton.setTag(device); // set the tag to the BluetoothDevice object to identify the selected device later
                 radioButton.setLayoutParams(new RadioGroup.LayoutParams(
-                        RadioGroup.LayoutParams.WRAP_CONTENT,
+                        RadioGroup.LayoutParams.MATCH_PARENT,
                         RadioGroup.LayoutParams.WRAP_CONTENT));
                 radioButton.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this.getContext(), R.color.beige)));
                 radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
@@ -191,7 +201,18 @@ public class ConfigFragment extends Fragment {
                 if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                     // Permission denied. You cannot access Bluetooth features.
                     // Exit the app
-                    getActivity().finish();
+                    closeApp();
+                }
+                Log.i("BLUETOOTH_CONNECT_REQUEST_CODE", " GRANTED");
+            }
+            case COARSE_LOCATION_REQUEST_CODE: {
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    // permission granted, you can now access the coarse location
+                    Log.i("LOCATION NOW ", "GRANTED");
+                } else {
+                    Log.i("LOCATION DENIED ", "");
+                    // permission denied, you cannot access the coarse location
+                    closeApp();
                 }
             }
             default: {
@@ -199,5 +220,45 @@ public class ConfigFragment extends Fragment {
             }
 
         }
+    }
+
+    private void registerBluetoothStateReceiver() {
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        BluetoothStateReceiver bluetoothStateReceiver = new BluetoothStateReceiver();
+        this.getActivity().registerReceiver(bluetoothStateReceiver, filter);
+    }
+
+    private class BluetoothStateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                if (state == BluetoothAdapter.STATE_OFF) {
+                    // Bluetooth has been turned off
+                    exitAppPopUpMessage();
+                }
+            }
+        }
+    }
+
+    private void exitAppPopUpMessage() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setMessage("You turned Off bluetooth, Bambino will close now.");
+        builder.setTitle("Bluetooth Turned Off");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // do something when the OK button is clicked
+                closeApp();
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void closeApp() {
+        this.getActivity().finish();
     }
 }
