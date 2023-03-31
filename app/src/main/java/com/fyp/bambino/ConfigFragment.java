@@ -19,6 +19,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -26,12 +27,17 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -45,13 +51,15 @@ import java.util.Set;
  */
 public class ConfigFragment extends Fragment {
 
+    private ProgressBar bluetoothProgressBar;
+    private RadioGroup bluetoothDevicesRadioGroup;
 
+    private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
-    private BluetoothLeScanner bluetoothLeScanner;
-    private ScanCallback scanCallback;
-    private BluetoothGatt bluetoothGatt;
 
-    private static final int REQUEST_LOCATION_PERMISSION = 1;
+    private Set<BluetoothDevice> pairedDevices;
+
+    private static final int BLUETOOTH_CONNECT_REQUEST_CODE = 1;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -99,64 +107,13 @@ public class ConfigFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_config, container, false);
+        initUI(rootView);
+        setUpBluetooth();
+        turnOnBluetooth();
 
-        bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-        bluetoothLeScanner = bluetoothAdapter.getBluetoothLeScanner();
-
-        scanCallback = new ScanCallback() {
-            @Override
-            public void onScanResult(int callbackType, ScanResult result) {
-                BluetoothDevice device = result.getDevice();
-                if (ContextCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                    ActivityCompat.requestPermissions(getActivity(), new String[]{Manifest.permission.ACCESS_COARSE_LOCATION}, REQUEST_LOCATION_PERMISSION);
-                } else {
-                    startBleScan();
-                }
-                if (device.getName() != null && device.getName().equals("Bambino")) {
-                    connectToDevice(device);
-                }
-                bluetoothLeScanner.stopScan(scanCallback);
-            }
-        };
-
-        bluetoothLeScanner.startScan(scanCallback);
         return rootView;
 
     }
-    private void startBleScan() {
-        bluetoothLeScanner.startScan(scanCallback);
-    }
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == REQUEST_LOCATION_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                startBleScan();
-            } else {
-                // Permission denied
-            }
-        }
-    }
-
-    private void connectToDevice(BluetoothDevice device) {
-        bluetoothGatt = device.connectGatt(this, false, gattCallback);
-    }
-
-    private BluetoothGattCallback gattCallback = new BluetoothGattCallback() {
-        @Override
-        public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
-            if (newState == BluetoothProfile.STATE_CONNECTED) {
-                // Device connected, discover services
-                gatt.discoverServices();
-            } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-                // Device disconnected
-            }
-        }
-
-        @Override
-        public void onServicesDiscovered(BluetoothGatt gatt, int status) {
-            // Services discovered, handle characteristics
-        }
-    };
 
     @Override
     public void onDestroyView() {
@@ -164,5 +121,83 @@ public class ConfigFragment extends Fragment {
 
     }
 
+    private void initUI(View view) {
+        this.bluetoothProgressBar = view.findViewById(R.id.bluetooth_progress_bar);
+        this.bluetoothDevicesRadioGroup = view.findViewById(R.id.radio_group_bluetooth);
+    }
 
+    private void setUpBluetooth() {
+        this.bluetoothManager = this.getActivity().getSystemService(BluetoothManager.class);
+        this.bluetoothAdapter = this.bluetoothManager.getAdapter();
+        if (this.bluetoothAdapter == null) {
+            //Device does not support Bluetooth -> Close the app
+            this.getActivity().finish();
+        }
+    }
+
+    private void turnOnBluetooth() {
+        if (!this.bluetoothAdapter.isEnabled()) {
+            Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            ActivityResultLauncher<Intent> enableBtLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
+                if (result.getResultCode() == Activity.RESULT_OK) {
+                    //Allow pressed
+                    getPairedBluetoothDevices();
+                    hideProgressBar();
+                } else {
+                    //Deny pressed -> close the app
+                    this.getActivity().finish();
+                }
+            });
+            enableBtLauncher.launch(enableBTIntent);
+        } else {
+            //Bluetooth already turned On
+            getPairedBluetoothDevices();
+            hideProgressBar();
+        }
+    }
+
+    private void getPairedBluetoothDevices() {
+        if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this.getActivity(), new String[]{Manifest.permission.BLUETOOTH_CONNECT}, BLUETOOTH_CONNECT_REQUEST_CODE);
+        }
+        this.pairedDevices = this.bluetoothAdapter.getBondedDevices();
+        if (this.pairedDevices.size() > 0) {
+            // There are paired devices. Get the name and address of each paired device.
+            for (BluetoothDevice device : pairedDevices) {
+                RadioButton radioButton = new RadioButton(this.getContext());
+                radioButton.setText(device.getName()); // or device.getAddress() depending on what you want to display
+                radioButton.setTag(device); // set the tag to the BluetoothDevice object to identify the selected device later
+                radioButton.setLayoutParams(new RadioGroup.LayoutParams(
+                        RadioGroup.LayoutParams.WRAP_CONTENT,
+                        RadioGroup.LayoutParams.WRAP_CONTENT));
+                radioButton.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this.getContext(), R.color.beige)));
+                radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
+                radioButton.setTextColor(ContextCompat.getColor(this.getContext(), R.color.gray));
+                radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+                bluetoothDevicesRadioGroup.addView(radioButton);
+            }
+        }
+    }
+
+    private void hideProgressBar() {
+        this.bluetoothProgressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        switch (requestCode) {
+            case BLUETOOTH_CONNECT_REQUEST_CODE: {
+                // If request is cancelled, the result arrays are empty.
+                if (!(grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
+                    // Permission denied. You cannot access Bluetooth features.
+                    // Exit the app
+                    getActivity().finish();
+                }
+            }
+            default: {
+                return;
+            }
+
+        }
+    }
 }

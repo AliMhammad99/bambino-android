@@ -88,7 +88,7 @@
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="160dp"
+                    android:layout_height="165dp"
                     android:scrollbarThumbVertical="@color/beige">
 
                     <RadioGroup
@@ -98,7 +98,7 @@
                         android:layout_marginTop="10dp"
                         android:paddingLeft="12dp">
                         <ProgressBar
-                            android:id="@+id/loader_scan"
+                            android:id="@+id/bluetooth_progress_bar"
                             style="?android:attr/progressBarStyle"
                             android:layout_width="match_parent"
                             android:layout_height="150dp"
@@ -128,7 +128,7 @@
                 <Button
                     android:id="@+id/btn_next"
                     android:layout_width="match_parent"
-                    android:layout_height="45dp"
+                    android:layout_height="50dp"
                     android:layout_gravity="bottom|right"
                     android:background="@drawable/shp_btn_back"
                     android:fontFamily="@font/gotham_bold"
