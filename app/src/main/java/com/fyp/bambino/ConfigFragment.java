@@ -127,7 +127,7 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-
+        this.getActivity().unregisterReceiver(scanReceiver);
     }
 
     private void initUI(View view) {
@@ -151,45 +151,51 @@ public class ConfigFragment extends Fragment {
     }
 
     private void requestBlueToothScanPermission() {
-//        ActivityResultLauncher<String> requestPermissionLauncher =
-//                registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-//                    if (isGranted) {
-//                        // Permission granted, do your work here
-//                        Log.i("GRANTED NOW!!!!!!!", "");
-//                    } else {
-//                        // Permission denied, handle the case accordingly
-//                        closeApp();
-//                    }
-//                });
-//        requestPermissionLauncher.launch(BluetoothAdapter.EXTRA_SCAN_MODE);
-        Log.i("SCANNING.............................","");
+        Log.i("SCANNING.............................", "");
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-//            closeApp();
-            Log.i("BLUETOOTH_SCAN NOT GRANTED.............................","");
+            Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
             ActivityCompat.requestPermissions(this.getActivity(),
                     new String[]{Manifest.permission.BLUETOOTH_SCAN},
                     BLUETOOTH_SCAN_REQUEST_CODE);
 
         }
         bluetoothAdapter.startDiscovery();
-        BroadcastReceiver receiver = new BroadcastReceiver() {
-            @Override
-            public void onReceive(Context context, Intent intent) {
-                Log.i("DEVICE FOUND.............................","");
-                String action = intent.getAction();
 
-                if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                    // A new Bluetooth device has been discovered
-                    Log.i("DEVICE FOUND.............................","");
-                    BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                    // Do something with the device
-                }
-            }
-        };
 
         IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        this.getActivity().registerReceiver(receiver, filter);
+        this.getActivity().registerReceiver(scanReceiver, filter);
     }
+
+    private BroadcastReceiver scanReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Log.i("DEVICE FOUND.............................", "");
+            String action = intent.getAction();
+
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // A new Bluetooth device has been discovered
+                Log.i("DEVICE FOUND.............................", "");
+                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                            BLUETOOTH_CONNECT_REQUEST_CODE);
+                }
+                Log.i("BLUETOOTH DEVICE:    ", device.getName());
+                // Do something with the device
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.i("SCAN FINISHED.............................", "");
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                    Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
+                            BLUETOOTH_SCAN_REQUEST_CODE);
+
+                }
+                bluetoothAdapter.startDiscovery();
+            }
+        }
+    };
 
     private void setUpBluetooth() {
         this.bluetoothManager = this.getActivity().getSystemService(BluetoothManager.class);
@@ -199,6 +205,8 @@ public class ConfigFragment extends Fragment {
             closeApp();
         }
     }
+
+
 
     private void turnOnBluetooth() {
         if (!this.bluetoothAdapter.isEnabled()) {
@@ -273,12 +281,12 @@ public class ConfigFragment extends Fragment {
                     closeApp();
                 }
             }
-            case BLUETOOTH_SCAN_REQUEST_CODE:{
+            case BLUETOOTH_SCAN_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission has been granted
-                    Log.i("HELLO SCAN","");
+                    Log.i("HELLO SCAN", "");
                 } else {
-                    Log.i("NOT HELLO SCAN","");
+                    Log.i("NOT HELLO SCAN", "");
                     // Permission has been denied
                     closeApp();
                 }
