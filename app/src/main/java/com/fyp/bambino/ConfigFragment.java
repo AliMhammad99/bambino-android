@@ -10,6 +10,7 @@ import android.bluetooth.BluetoothGatt;
 import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
 import android.bluetooth.BluetoothProfile;
+import android.bluetooth.BluetoothSocket;
 import android.bluetooth.le.BluetoothLeScanner;
 import android.bluetooth.le.ScanCallback;
 import android.bluetooth.le.ScanResult;
@@ -30,20 +31,28 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
+import android.os.Handler;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.CompoundButton;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -54,7 +63,10 @@ public class ConfigFragment extends Fragment {
 
     private ProgressBar bluetoothProgressBar;
     private RadioGroup bluetoothDevicesRadioGroup;
-
+    private ImageButton refreshButton;
+    private TextView tvNoDevicesFound;
+    private boolean noDevicesFound = true;
+    private Button connectButton;
     private BluetoothManager bluetoothManager;
     private BluetoothAdapter bluetoothAdapter;
 
@@ -65,6 +77,9 @@ public class ConfigFragment extends Fragment {
     private static final int COARSE_LOCATION_REQUEST_CODE = 2;
     private static final int BLUETOOTH_SCAN_REQUEST_CODE = 3;
 
+    private static final UUID MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
+
+    private BluetoothDevice currentBluetoothDevice;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -126,12 +141,48 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-//        this.getActivity().unregisterReceiver(scanReceiver);
+        this.getActivity().unregisterReceiver(scanReceiver);
     }
 
     private void initUI(View view) {
         this.bluetoothProgressBar = view.findViewById(R.id.bluetooth_progress_bar);
         this.bluetoothDevicesRadioGroup = view.findViewById(R.id.radio_group_bluetooth);
+        this.refreshButton = view.findViewById(R.id.btn_refresh);
+        this.tvNoDevicesFound = view.findViewById(R.id.tv_no_devices_found);
+        this.connectButton = view.findViewById(R.id.btn_connect);
+        this.refreshButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+                    ActivityCompat.requestPermissions(getActivity(),
+                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
+                            BLUETOOTH_SCAN_REQUEST_CODE);
+                }
+                bluetoothAdapter.startDiscovery();
+            }
+        });
+        this.connectButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (currentBluetoothDevice != null) {
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                                BLUETOOTH_CONNECT_REQUEST_CODE);
+                    }
+                    BluetoothSocket socket = null;
+                    try {
+                        socket = currentBluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                        socket.connect();
+                        OutputStream outputStream = socket.getOutputStream();
+                        outputStream.write("Bambino App Connected!".getBytes());
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
+
+                }
+            }
+        });
     }
 
     private void requestLocationPermission() {
@@ -160,9 +211,26 @@ public class ConfigFragment extends Fragment {
         }
         bluetoothAdapter.startDiscovery();
 
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+//                    ActivityCompat.requestPermissions(getActivity(),
+//                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
+//                            BLUETOOTH_SCAN_REQUEST_CODE);
+//                }
+//                bluetoothAdapter.cancelDiscovery();
+//            }
+//        }, 12000);
+        IntentFilter scanFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+        this.getActivity().registerReceiver(scanReceiver, scanFilter);
 
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-        this.getActivity().registerReceiver(scanReceiver, filter);
+        IntentFilter finishDiscoveryFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_FINISHED);
+        this.getActivity().registerReceiver(scanReceiver, finishDiscoveryFilter);
+
+        IntentFilter startDiscoveryFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
+        this.getActivity().registerReceiver(scanReceiver, startDiscoveryFilter);
+
     }
 
     private BroadcastReceiver scanReceiver = new BroadcastReceiver() {
@@ -171,7 +239,10 @@ public class ConfigFragment extends Fragment {
             Log.i("DEVICE FOUND.............................", "");
             String action = intent.getAction();
 
-            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+            if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
+                showProgressBar();
+                hideTVNoDevicesFound();
+            } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // A new Bluetooth device has been discovered
                 Log.i("DEVICE FOUND.............................", "");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
@@ -182,25 +253,32 @@ public class ConfigFragment extends Fragment {
                 }
                 Log.i("BLUETOOTH DEVICE:    ", device.getName());
 //                scannedDevices.add(device);
-                hideProgressBar();
+//                hideProgressBar();
+                noDevicesFound = false;
+                hideTVNoDevicesFound();
                 renderScannedDevice(device);
                 // Do something with the device
-            }
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i("SCAN FINISHED.............................", "");
-                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-                    Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
-                    ActivityCompat.requestPermissions(getActivity(),
-                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
-                            BLUETOOTH_SCAN_REQUEST_CODE);
-
+//                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+//                    Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
+//                    ActivityCompat.requestPermissions(getActivity(),
+//                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
+//                            BLUETOOTH_SCAN_REQUEST_CODE);
+//
+//                }
+                Log.i("NO DEVICES FOUND", String.valueOf(noDevicesFound));
+                if (noDevicesFound) {
+//                    tvNoDevicesFound.setVisibility(View.VISIBLE);
+                    showTVNoDevicesFound();
                 }
-                bluetoothAdapter.startDiscovery();
+                hideProgressBar();
+//                bluetoothAdapter.startDiscovery();
             }
         }
     };
 
-    private void renderScannedDevice(BluetoothDevice device){
+    private void renderScannedDevice(BluetoothDevice device) {
         RadioButton radioButton = new RadioButton(this.getContext());
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(getActivity(),
@@ -216,7 +294,32 @@ public class ConfigFragment extends Fragment {
         radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
         radioButton.setTextColor(ContextCompat.getColor(this.getContext(), R.color.gray));
         radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        radioButton.setGravity(Gravity.LEFT| Gravity.CENTER_VERTICAL);
+        radioButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+        radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                Log.i("CHECKEDDDDDDDDDD","DDDDDD=========");
+                if (isChecked) {
+                    // RadioButton is checked
+                    RadioButton checkedRadioButton = (RadioButton) compoundButton;
+                    BluetoothDevice device = (BluetoothDevice) checkedRadioButton.getTag();
+                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(getActivity(),
+                                new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                                BLUETOOTH_CONNECT_REQUEST_CODE);
+                    }
+                    Log.i("CHECKED DEVICE NAME:    ",device.getName());
+                    if (device.getName().equals("Bambino")) {
+                        currentBluetoothDevice = device;
+                        enableConnectButton();
+                    } else {
+                        currentBluetoothDevice = null;
+                        disableConnectButton();
+                    }
+
+                }
+            }
+        });
         bluetoothDevicesRadioGroup.addView(radioButton);
     }
 
@@ -228,7 +331,6 @@ public class ConfigFragment extends Fragment {
             closeApp();
         }
     }
-
 
 
     private void turnOnBluetooth() {
@@ -273,6 +375,7 @@ public class ConfigFragment extends Fragment {
                 radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
                 radioButton.setTextColor(ContextCompat.getColor(this.getContext(), R.color.gray));
                 radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+
                 bluetoothDevicesRadioGroup.addView(radioButton);
             }
         }
@@ -280,6 +383,23 @@ public class ConfigFragment extends Fragment {
 
     private void hideProgressBar() {
         this.bluetoothProgressBar.setVisibility(View.GONE);
+    }
+
+    private void showProgressBar() {
+        this.bluetoothProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    private void showTVNoDevicesFound(){
+        this.tvNoDevicesFound.setVisibility(View.VISIBLE);
+    }
+    private void hideTVNoDevicesFound(){
+        this.tvNoDevicesFound.setVisibility(View.GONE);
+    }
+    private void enableConnectButton(){
+        this.connectButton.setEnabled(true);
+    }
+    private void disableConnectButton(){
+        this.connectButton.setEnabled(false);
     }
 
     @Override
