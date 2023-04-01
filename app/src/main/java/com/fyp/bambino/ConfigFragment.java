@@ -32,6 +32,7 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.util.TypedValue;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -58,13 +59,11 @@ public class ConfigFragment extends Fragment {
     private BluetoothAdapter bluetoothAdapter;
 
     private Set<BluetoothDevice> pairedDevices;
+    private Set<BluetoothDevice> scannedDevices;
 
     private static final int BLUETOOTH_CONNECT_REQUEST_CODE = 1;
     private static final int COARSE_LOCATION_REQUEST_CODE = 2;
     private static final int BLUETOOTH_SCAN_REQUEST_CODE = 3;
-
-    String[] permissions = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION};
-    int MY_PERMISSIONS_REQUEST_CODE = 123;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -182,8 +181,12 @@ public class ConfigFragment extends Fragment {
                             BLUETOOTH_CONNECT_REQUEST_CODE);
                 }
                 Log.i("BLUETOOTH DEVICE:    ", device.getName());
+//                scannedDevices.add(device);
+                hideProgressBar();
+                renderScannedDevice(device);
                 // Do something with the device
-            } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+            }
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 Log.i("SCAN FINISHED.............................", "");
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                     Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
@@ -196,6 +199,26 @@ public class ConfigFragment extends Fragment {
             }
         }
     };
+
+    private void renderScannedDevice(BluetoothDevice device){
+        RadioButton radioButton = new RadioButton(this.getContext());
+        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(getActivity(),
+                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                    BLUETOOTH_CONNECT_REQUEST_CODE);
+        }
+        radioButton.setText(device.getName()); // or device.getAddress() depending on what you want to display
+        radioButton.setTag(device); // set the tag to the BluetoothDevice object to identify the selected device later
+        radioButton.setLayoutParams(new RadioGroup.LayoutParams(
+                RadioGroup.LayoutParams.MATCH_PARENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT));
+        radioButton.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this.getContext(), R.color.beige)));
+        radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
+        radioButton.setTextColor(ContextCompat.getColor(this.getContext(), R.color.gray));
+        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+        radioButton.setGravity(Gravity.LEFT| Gravity.CENTER_VERTICAL);
+        bluetoothDevicesRadioGroup.addView(radioButton);
+    }
 
     private void setUpBluetooth() {
         this.bluetoothManager = this.getActivity().getSystemService(BluetoothManager.class);
@@ -214,8 +237,8 @@ public class ConfigFragment extends Fragment {
             ActivityResultLauncher<Intent> enableBtLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     //Allow pressed
-                    getPairedBluetoothDevices();
-                    hideProgressBar();
+//                    getPairedBluetoothDevices();
+//                    hideProgressBar();
                     requestBlueToothScanPermission();
 
                 } else {
@@ -226,8 +249,8 @@ public class ConfigFragment extends Fragment {
             enableBtLauncher.launch(enableBTIntent);
         } else {
             //Bluetooth already turned On
-            getPairedBluetoothDevices();
-            hideProgressBar();
+//            getPairedBluetoothDevices();
+//            hideProgressBar();
             requestBlueToothScanPermission();
         }
     }
