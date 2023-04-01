@@ -126,7 +126,7 @@ public class ConfigFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        this.getActivity().unregisterReceiver(scanReceiver);
+//        this.getActivity().unregisterReceiver(scanReceiver);
     }
 
     private void initUI(View view) {
