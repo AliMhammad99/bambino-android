@@ -63,6 +63,10 @@ public class ConfigFragment extends Fragment {
     private static final int COARSE_LOCATION_REQUEST_CODE = 2;
     private static final int BLUETOOTH_SCAN_REQUEST_CODE = 3;
 
+    String[] permissions = {Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT, Manifest.permission.ACCESS_FINE_LOCATION};
+    int MY_PERMISSIONS_REQUEST_CODE = 123;
+
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -158,17 +162,25 @@ public class ConfigFragment extends Fragment {
 //                    }
 //                });
 //        requestPermissionLauncher.launch(BluetoothAdapter.EXTRA_SCAN_MODE);
+        Log.i("SCANNING.............................","");
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            closeApp();
+//            closeApp();
+            Log.i("BLUETOOTH_SCAN NOT GRANTED.............................","");
+            ActivityCompat.requestPermissions(this.getActivity(),
+                    new String[]{Manifest.permission.BLUETOOTH_SCAN},
+                    BLUETOOTH_SCAN_REQUEST_CODE);
+
         }
         bluetoothAdapter.startDiscovery();
         BroadcastReceiver receiver = new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
+                Log.i("DEVICE FOUND.............................","");
                 String action = intent.getAction();
 
                 if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                     // A new Bluetooth device has been discovered
+                    Log.i("DEVICE FOUND.............................","");
                     BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                     // Do something with the device
                 }
@@ -268,6 +280,7 @@ public class ConfigFragment extends Fragment {
                 } else {
                     Log.i("NOT HELLO SCAN","");
                     // Permission has been denied
+                    closeApp();
                 }
             }
             default: {
