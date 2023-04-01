@@ -130,7 +130,6 @@ public class ConfigFragment extends Fragment {
 
         initUI(rootView);
         requestLocationPermission();
-//        requestBlueToothScanPermission();
         setUpBluetooth();
         turnOnBluetooth();
         registerBluetoothStateReceiver();
@@ -165,20 +164,25 @@ public class ConfigFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 if (currentBluetoothDevice != null) {
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{Manifest.permission.BLUETOOTH_CONNECT},
-                                BLUETOOTH_CONNECT_REQUEST_CODE);
-                    }
-                    BluetoothSocket socket = null;
-                    try {
-                        socket = currentBluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
-                        socket.connect();
-                        OutputStream outputStream = socket.getOutputStream();
-                        outputStream.write("Bambino App Connected!".getBytes());
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
+                    new Handler().postDelayed(new Runnable() {
+                        @Override
+                        public void run() {
+                            if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                                ActivityCompat.requestPermissions(getActivity(),
+                                        new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                                        BLUETOOTH_CONNECT_REQUEST_CODE);
+                            }
+                            BluetoothSocket socket = null;
+                            try {
+                                socket = currentBluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
+                                socket.connect();
+                                OutputStream outputStream = socket.getOutputStream();
+                                outputStream.write("Bambino App Connected!".getBytes());
+                            } catch (IOException e) {
+                                Toast.makeText(getContext(), "Failed to connect to this device!", Toast.LENGTH_LONG).show();
+                            }
+                        }
+                    }, 100);
 
                 }
             }
@@ -188,22 +192,16 @@ public class ConfigFragment extends Fragment {
     private void requestLocationPermission() {
         ActivityResultLauncher<String> requestPermissionLauncher =
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-                    if (isGranted) {
-                        // Permission granted, do your work here
-                        Log.i("GRANTED NOW!!!!!!!", "");
-                    } else {
+                    if (!isGranted) {
                         // Permission denied, handle the case accordingly
                         closeApp();
                     }
                 });
-//        requestPermissionLauncher.launch(Manifest.permission.ACCESS_COARSE_LOCATION);
         requestPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION);
     }
 
     private void requestBlueToothScanPermission() {
-        Log.i("SCANNING.............................", "");
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-            Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
             ActivityCompat.requestPermissions(this.getActivity(),
                     new String[]{Manifest.permission.BLUETOOTH_SCAN},
                     BLUETOOTH_SCAN_REQUEST_CODE);
@@ -211,17 +209,6 @@ public class ConfigFragment extends Fragment {
         }
         bluetoothAdapter.startDiscovery();
 
-//        new Handler().postDelayed(new Runnable() {
-//            @Override
-//            public void run() {
-//                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-//                    ActivityCompat.requestPermissions(getActivity(),
-//                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
-//                            BLUETOOTH_SCAN_REQUEST_CODE);
-//                }
-//                bluetoothAdapter.cancelDiscovery();
-//            }
-//        }, 12000);
         IntentFilter scanFilter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
         this.getActivity().registerReceiver(scanReceiver, scanFilter);
 
@@ -236,7 +223,6 @@ public class ConfigFragment extends Fragment {
     private BroadcastReceiver scanReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            Log.i("DEVICE FOUND.............................", "");
             String action = intent.getAction();
 
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
@@ -244,36 +230,21 @@ public class ConfigFragment extends Fragment {
                 hideTVNoDevicesFound();
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // A new Bluetooth device has been discovered
-                Log.i("DEVICE FOUND.............................", "");
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.BLUETOOTH_CONNECT},
                             BLUETOOTH_CONNECT_REQUEST_CODE);
                 }
-                Log.i("BLUETOOTH DEVICE:    ", device.getName());
-//                scannedDevices.add(device);
-//                hideProgressBar();
                 noDevicesFound = false;
                 hideTVNoDevicesFound();
                 renderScannedDevice(device);
                 // Do something with the device
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Log.i("SCAN FINISHED.............................", "");
-//                if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
-//                    Log.i("BLUETOOTH_SCAN NOT GRANTED.............................", "");
-//                    ActivityCompat.requestPermissions(getActivity(),
-//                            new String[]{Manifest.permission.BLUETOOTH_SCAN},
-//                            BLUETOOTH_SCAN_REQUEST_CODE);
-//
-//                }
-                Log.i("NO DEVICES FOUND", String.valueOf(noDevicesFound));
                 if (noDevicesFound) {
-//                    tvNoDevicesFound.setVisibility(View.VISIBLE);
                     showTVNoDevicesFound();
                 }
                 hideProgressBar();
-//                bluetoothAdapter.startDiscovery();
             }
         }
     };
@@ -298,7 +269,6 @@ public class ConfigFragment extends Fragment {
         radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                Log.i("CHECKEDDDDDDDDDD","DDDDDD=========");
                 if (isChecked) {
                     // RadioButton is checked
                     RadioButton checkedRadioButton = (RadioButton) compoundButton;
@@ -308,7 +278,6 @@ public class ConfigFragment extends Fragment {
                                 new String[]{Manifest.permission.BLUETOOTH_CONNECT},
                                 BLUETOOTH_CONNECT_REQUEST_CODE);
                     }
-                    Log.i("CHECKED DEVICE NAME:    ",device.getName());
                     if (device.getName().equals("Bambino")) {
                         currentBluetoothDevice = device;
                         enableConnectButton();
@@ -339,8 +308,6 @@ public class ConfigFragment extends Fragment {
             ActivityResultLauncher<Intent> enableBtLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
                 if (result.getResultCode() == Activity.RESULT_OK) {
                     //Allow pressed
-//                    getPairedBluetoothDevices();
-//                    hideProgressBar();
                     requestBlueToothScanPermission();
 
                 } else {
@@ -351,8 +318,6 @@ public class ConfigFragment extends Fragment {
             enableBtLauncher.launch(enableBTIntent);
         } else {
             //Bluetooth already turned On
-//            getPairedBluetoothDevices();
-//            hideProgressBar();
             requestBlueToothScanPermission();
         }
     }
@@ -412,14 +377,11 @@ public class ConfigFragment extends Fragment {
                     // Exit the app
                     closeApp();
                 }
-                Log.i("BLUETOOTH_CONNECT_REQUEST_CODE", " GRANTED");
             }
             case COARSE_LOCATION_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // permission granted, you can now access the coarse location
-                    Log.i("LOCATION NOW ", "GRANTED");
                 } else {
-                    Log.i("LOCATION DENIED ", "");
                     // permission denied, you cannot access the coarse location
                     closeApp();
                 }
@@ -427,9 +389,7 @@ public class ConfigFragment extends Fragment {
             case BLUETOOTH_SCAN_REQUEST_CODE: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     // Permission has been granted
-                    Log.i("HELLO SCAN", "");
                 } else {
-                    Log.i("NOT HELLO SCAN", "");
                     // Permission has been denied
                     closeApp();
                 }
