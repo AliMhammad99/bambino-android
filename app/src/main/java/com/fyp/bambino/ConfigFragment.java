@@ -21,6 +21,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -152,6 +153,7 @@ public class ConfigFragment extends Fragment {
         this.refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
                     ActivityCompat.requestPermissions(getActivity(),
                             new String[]{Manifest.permission.BLUETOOTH_SCAN},
@@ -227,6 +229,8 @@ public class ConfigFragment extends Fragment {
 
             if (BluetoothAdapter.ACTION_DISCOVERY_STARTED.equals(action)) {
                 showProgressBar();
+                removeAllRadioButtons(bluetoothDevicesRadioGroup);
+                noDevicesFound = true;
                 hideTVNoDevicesFound();
             } else if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // A new Bluetooth device has been discovered
@@ -242,12 +246,25 @@ public class ConfigFragment extends Fragment {
                 // Do something with the device
             } else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
                 if (noDevicesFound) {
+                    Log.i("TV:   ", String.valueOf(tvNoDevicesFound));
+                    tvNoDevicesFound.setTextColor(ContextCompat.getColor(getContext(), R.color.gray));
+                    tvNoDevicesFound.setVisibility(View.VISIBLE);
                     showTVNoDevicesFound();
                 }
                 hideProgressBar();
             }
         }
     };
+
+    private void removeAllRadioButtons(RadioGroup radioGroup) {
+        for (int i = 0; i < radioGroup.getChildCount(); i++) {
+            View view = radioGroup.getChildAt(i);
+            if (view instanceof RadioButton) {
+                radioGroup.removeView(view);
+                i--; // Decrement i so that we don't skip over the next view
+            }
+        }
+    }
 
     private void renderScannedDevice(BluetoothDevice device) {
         RadioButton radioButton = new RadioButton(this.getContext());
