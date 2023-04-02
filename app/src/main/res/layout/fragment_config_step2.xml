@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -41,53 +42,10 @@
                 android:fontFamily="@font/gotham_book"
                 android:hyphenationFrequency="normal"
                 android:lineSpacingExtra="7dp"
-                android:text="Please enter your Wi-Fi credentials."
+                android:text="Please enter your Wi-Fi credentials and choose the device mode."
                 android:textColor="@color/gray"
                 android:textSize="14sp" />
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-
-                android:orientation="horizontal">
-
-                <ImageView
-                    android:layout_width="18dp"
-                    android:layout_height="match_parent"
-                    android:layout_gravity="center_vertical"
-                    android:layout_marginRight="7dp"
-                    android:src="@drawable/ic_bluetooth" />
-
-
-                <TextView
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center_vertical"
-                    android:layout_weight="1"
-                    android:breakStrategy="simple"
-                    android:fontFamily="@font/gotham_medium"
-                    android:hyphenationFrequency="normal"
-                    android:text="Available Devices"
-                    android:textColor="@color/gray"
-                    android:textSize="18sp" />
-
-                <ProgressBar
-                    android:id="@+id/bluetooth_progress_bar"
-                    style="?android:attr/progressBarStyle"
-                    android:layout_width="35dp"
-                    android:layout_height="match_parent"
-                    android:indeterminateTint="@color/beige" />
-
-                <ImageButton
-                    android:id="@+id/btn_refresh"
-                    android:layout_width="50dp"
-                    android:layout_height="50dp"
-                    android:layout_gravity="end"
-                    android:backgroundTint="#00000000"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
-                    android:scaleType="centerInside"
-                    android:src="@drawable/ic_refresh" />
-            </LinearLayout>
 
             <FrameLayout
                 android:layout_width="match_parent"
@@ -98,47 +56,41 @@
                     android:layout_height="165dp"
                     android:scrollbarThumbVertical="@color/beige">
 
-                    <RadioGroup
-                        android:id="@+id/radio_group_bluetooth"
+                    <!--                    <com.google.android.material.textfield.TextInputEditText-->
+                    <!--                        android:layout_width="match_parent"-->
+                    <!--                        android:layout_height="match_parent"-->
+                    <!--                        android:hint="Wi-Fi Name"-->
+                    <!--                        android:textColorHint="@color/gray"-->
+                    <!--                        android:fontFamily="@font/gotham_medium"-->
+                    <!--                        android:height="50dp"-->
+                    <!--                        android:background="@drawable/shp_btn_back_enabled"-->
+                    <!--                        android:drawableStart="@drawable/ic_refresh"-->
+                    <!--                        android:drawableWidth="24dp"-->
+                    <!--                        />-->
+                    <RelativeLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="10dp"
-                        android:paddingLeft="12dp">
+                        android:layout_height="wrap_content">
 
-                        <TextView
-                            android:id="@+id/tv_no_devices_found"
+
+                        <EditText
                             android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/gotham_book"
-                            android:text="No devices found."
-                            android:textColor="@color/gray"
-                            android:textSize="17sp"
-                            android:visibility="gone" />
-                        <!--                        <ProgressBar-->
-                        <!--                            android:id="@+id/bluetooth_progress_bar"-->
-                        <!--                            style="?android:attr/progressBarStyle"-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="150dp"-->
-                        <!--                            android:scaleX="0.4"-->
-                        <!--                            android:scaleY="0.4"-->
-                        <!--                            android:indeterminateTint="@color/beige"/>-->
-                        <!--                        <TextView-->
-                        <!--                            android:layout_width="match_parent"-->
-                        <!--                            android:layout_height="match_parent"-->
-                        <!--                            android:text="Bluetooth is Turned Off"/>-->
-                        <!--                        <RadioButton-->
+                            android:layout_height="match_parent"
+                            android:layout_centerVertical="true"
+                            android:height="50dp"
+                            android:background="@drawable/shp_btn_back_enabled"
+                            android:fontFamily="@font/gotham_medium"
+                            android:hint="Wi-Fi Name"
+                            android:paddingLeft="55dp"
+                            android:textColorHint="@color/gray" />
 
-                        <!--                            android:layout_width="wrap_content"-->
-                        <!--                            android:layout_height="wrap_content"-->
-                        <!--                            android:buttonTint="@color/beige"-->
-                        <!--                            android:fontFamily="@font/gotham_book"-->
-                        <!--                            android:text="Option 1"-->
-                        <!--                            android:textColor="@color/gray"-->
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="30dp"
+                            android:layout_centerVertical="true"
+                            android:layout_marginLeft="15dp"
+                            android:src="@drawable/ic_refresh" />
+                    </RelativeLayout>
 
-                        <!--                            android:textSize="18sp" />-->
-
-
-                    </RadioGroup>
                 </ScrollView>
 
                 <Button
