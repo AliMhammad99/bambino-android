@@ -6,4 +6,155 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context=".ConfigFragmentStep1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+
+        android:layout_margin="20dp"
+        android:fontFamily="@font/gotham_bold"
+        android:text="Configuration"
+        android:textColor="@color/gray"
+        android:textSize="28sp"
+        android:textStyle="bold" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:contentDescription="Scroll horizontally to view more content"
+
+        >
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="115dp">
+
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="15dp"
+                android:breakStrategy="simple"
+                android:fontFamily="@font/gotham_book"
+                android:hyphenationFrequency="normal"
+                android:lineSpacingExtra="7dp"
+                android:text="Please enter your Wi-Fi credentials."
+                android:textColor="@color/gray"
+                android:textSize="14sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:layout_marginRight="7dp"
+                    android:src="@drawable/ic_bluetooth" />
+
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical"
+                    android:layout_weight="1"
+                    android:breakStrategy="simple"
+                    android:fontFamily="@font/gotham_medium"
+                    android:hyphenationFrequency="normal"
+                    android:text="Available Devices"
+                    android:textColor="@color/gray"
+                    android:textSize="18sp" />
+
+                <ProgressBar
+                    android:id="@+id/bluetooth_progress_bar"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="35dp"
+                    android:layout_height="match_parent"
+                    android:indeterminateTint="@color/beige" />
+
+                <ImageButton
+                    android:id="@+id/btn_refresh"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="end"
+                    android:backgroundTint="#00000000"
+                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_refresh" />
+            </LinearLayout>
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="250dp">
+
+                <ScrollView
+                    android:layout_width="match_parent"
+                    android:layout_height="165dp"
+                    android:scrollbarThumbVertical="@color/beige">
+
+                    <RadioGroup
+                        android:id="@+id/radio_group_bluetooth"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:paddingLeft="12dp">
+
+                        <TextView
+                            android:id="@+id/tv_no_devices_found"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:fontFamily="@font/gotham_book"
+                            android:text="No devices found."
+                            android:textColor="@color/gray"
+                            android:textSize="17sp"
+                            android:visibility="gone" />
+                        <!--                        <ProgressBar-->
+                        <!--                            android:id="@+id/bluetooth_progress_bar"-->
+                        <!--                            style="?android:attr/progressBarStyle"-->
+                        <!--                            android:layout_width="match_parent"-->
+                        <!--                            android:layout_height="150dp"-->
+                        <!--                            android:scaleX="0.4"-->
+                        <!--                            android:scaleY="0.4"-->
+                        <!--                            android:indeterminateTint="@color/beige"/>-->
+                        <!--                        <TextView-->
+                        <!--                            android:layout_width="match_parent"-->
+                        <!--                            android:layout_height="match_parent"-->
+                        <!--                            android:text="Bluetooth is Turned Off"/>-->
+                        <!--                        <RadioButton-->
+
+                        <!--                            android:layout_width="wrap_content"-->
+                        <!--                            android:layout_height="wrap_content"-->
+                        <!--                            android:buttonTint="@color/beige"-->
+                        <!--                            android:fontFamily="@font/gotham_book"-->
+                        <!--                            android:text="Option 1"-->
+                        <!--                            android:textColor="@color/gray"-->
+
+                        <!--                            android:textSize="18sp" />-->
+
+
+                    </RadioGroup>
+                </ScrollView>
+
+                <Button
+                    android:id="@+id/btn_connect"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:layout_gravity="bottom|right"
+                    android:background="@drawable/slc_btn_background"
+                    android:enabled="false"
+                    android:fontFamily="@font/gotham_bold"
+                    android:foreground="@drawable/rpl_btn_back"
+                    android:stateListAnimator="@null"
+                    android:text="Connect"
+                    android:textSize="20sp"
+                    app:backgroundTint="@null" />
+            </FrameLayout>
+        </LinearLayout>
+    </ScrollView>
 </LinearLayout>
