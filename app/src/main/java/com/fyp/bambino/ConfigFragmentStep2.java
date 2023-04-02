@@ -92,11 +92,12 @@ public class ConfigFragmentStep2 extends Fragment {
         this.modeSpinner = view.findViewById(R.id.spinner_mode);
         final List<String> states = Arrays.asList("Local","Remote");
 
-        // Our custom Adapter class that we created
-        SpinnerAdapter adapter = new Sp(getActivity().getApplicationContext(), states);
-        adapter.setDropDownViewResource(R.layout.my_dropdown_item);
 
-        spinner.setAdapter(adapter);
+        // Our custom Adapter class that we created
+        SpinnerAdapter adapter = new ModeSpinnerAdapter(this.getContext(), states);
+//        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout);
+
+        this.modeSpinner.setAdapter(adapter);
     }
 
 }

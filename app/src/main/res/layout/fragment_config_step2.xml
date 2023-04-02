@@ -77,19 +77,19 @@
                                 android:layout_centerVertical="true"
                                 android:layout_marginHorizontal="4dp"
                                 android:height="45dp"
-
                                 android:background="@drawable/shp_edit_text"
                                 android:fontFamily="@font/gotham_medium"
                                 android:hint="Wi-Fi Name"
                                 android:paddingLeft="50dp"
                                 android:textColor="@color/gray"
-                                android:textColorHint="@color/white_gray" />
+                                android:textColorHint="@color/white_gray"
+                                android:textSize="17sp" />
 
                             <ImageView
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
                                 android:layout_centerVertical="true"
-                                android:layout_marginLeft="15dp"
+                                android:layout_marginLeft="18dp"
                                 android:src="@drawable/ic_wifi"
                                 app:tint="@color/gray" />
                         </RelativeLayout>
@@ -119,15 +119,17 @@
                                 android:minHeight="45dp"
                                 android:paddingLeft="50dp"
                                 android:textColor="@color/gray"
-                                android:textColorHint="@color/white_gray" />
+                                android:textColorHint="@color/white_gray"
+                                android:textSize="17sp" />
 
                             <ImageView
                                 android:layout_width="25dp"
                                 android:layout_height="25dp"
                                 android:layout_centerVertical="true"
-                                android:layout_marginLeft="15dp"
+                                android:layout_marginLeft="18dp"
                                 android:src="@drawable/ic_password"
                                 app:tint="@color/gray" />
+
                         </RelativeLayout>
 
                         <RelativeLayout
@@ -150,10 +152,27 @@
                                 android:height="45dp"
                                 android:background="@drawable/shp_edit_text"
 
-                                android:paddingLeft="43dp"
+                                android:paddingLeft="50dp"
                                 android:spinnerMode="dialog"
 
                                 />
+
+                            <ImageView
+                                android:layout_width="24dp"
+                                android:layout_height="24dp"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="18dp"
+                                android:src="@drawable/ic_mode"
+                                app:tint="@color/gray" />
+
+                            <ImageView
+                                android:layout_width="21dp"
+                                android:layout_height="21dp"
+                                android:layout_alignParentRight="true"
+                                android:layout_centerVertical="true"
+                                android:layout_marginRight="18dp"
+                                android:src="@drawable/ic_drop_down"
+                                app:tint="@color/gray" />
                             <!--                            android:entries="@array/spinner_mode_options"-->
                         </RelativeLayout>
                     </LinearLayout>

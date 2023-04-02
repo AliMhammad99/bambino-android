@@ -1,19 +1,22 @@
 package com.fyp.bambino;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.BaseAdapter;
+import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class ModeSpinnerAdapter extends BaseAdapter {
+public class ModeSpinnerAdapter extends ArrayAdapter<String> {
     private Context context;
-    private ArrayList<String> items;
+    private List<String> items;
 
-    public ModeSpinnerAdapter(Context context, ArrayList<String> items) {
+    public ModeSpinnerAdapter(Context context, List<String> items) {
+        super(context, R.layout.spinner_dropdown_item_layout, items);
         this.context = context;
         this.items = items;
     }
@@ -24,7 +27,7 @@ public class ModeSpinnerAdapter extends BaseAdapter {
     }
 
     @Override
-    public Object getItem(int position) {
+    public String getItem(int position) {
         return items.get(position);
     }
 
@@ -35,13 +38,16 @@ public class ModeSpinnerAdapter extends BaseAdapter {
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
-        if (convertView == null) {
-            convertView = LayoutInflater.from(context).inflate(R.layout.spinner_item_layout, parent, false);
-        }
+        LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+        View row = inflater.inflate(R.layout.spinner_selected_item_layout, parent, false);
+        // Image and TextViews
+        TextView state = row.findViewById(R.id.text);
+        // Get flag image from drawables folder
+//        Resources res = context.getResources();
 
-        TextView textView = convertView.findViewById(R.id.spinner_item_text_view);
-        textView.setText(items.get(position));
 
-        return convertView;
+        //Set state abbreviation and state flag
+        state.setText(items.get(position));
+        return row;
     }
 }
