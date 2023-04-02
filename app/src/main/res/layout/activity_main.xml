@@ -27,6 +27,7 @@
 
 
         <LinearLayout
+            android:id="@+id/navigation"
             android:layout_width="fill_parent"
             android:layout_height="55dp"
             android:layout_gravity="bottom"

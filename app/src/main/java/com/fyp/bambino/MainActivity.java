@@ -8,6 +8,10 @@ import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
+import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,9 +23,20 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
 
-
-
         setupNavigation();
+
+        LinearLayout navigation = findViewById(R.id.navigation);
+
+        KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
+            @Override
+            public void onVisibilityChanged(boolean isOpen) {
+                if(isOpen){
+                    navigation.setVisibility(View.GONE);
+                }else{
+                    navigation.setVisibility(View.VISIBLE);
+                }
+            }
+        });
 
     }
 
