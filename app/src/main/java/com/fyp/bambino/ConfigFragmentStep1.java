@@ -57,8 +57,10 @@ public class ConfigFragmentStep1 extends Fragment {
     private TextView tvNoDevicesFound;
     private boolean noDevicesFound = true;
     private Button connectButton;
-    private BluetoothManager bluetoothManager;
-    private BluetoothAdapter bluetoothAdapter;
+    public static BluetoothManager bluetoothManager;
+    public static BluetoothAdapter bluetoothAdapter;
+
+    public static BluetoothSocket socket = null;
 
     private Set<BluetoothDevice> pairedDevices;
     private Set<BluetoothDevice> scannedDevices;
@@ -163,13 +165,13 @@ public class ConfigFragmentStep1 extends Fragment {
                                         new String[]{Manifest.permission.BLUETOOTH_CONNECT},
                                         BLUETOOTH_CONNECT_REQUEST_CODE);
                             }
-                            BluetoothSocket socket = null;
+
                             try {
                                 socket = currentBluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
                                 socket.connect();
                                 OutputStream outputStream = socket.getOutputStream();
                                 outputStream.write("Bambino App Connected!".getBytes());
-                                ((MainActivity)getActivity()).goToConfigFragmentStep2();
+                                ((MainActivity) getActivity()).goToConfigFragmentStep2();
                             } catch (IOException e) {
                                 Toast.makeText(getContext(), "Failed to connect to this device!", Toast.LENGTH_LONG).show();
                             }
@@ -362,16 +364,19 @@ public class ConfigFragmentStep1 extends Fragment {
         this.bluetoothProgressBar.setVisibility(View.VISIBLE);
     }
 
-    private void showTVNoDevicesFound(){
+    private void showTVNoDevicesFound() {
         this.tvNoDevicesFound.setVisibility(View.VISIBLE);
     }
-    private void hideTVNoDevicesFound(){
+
+    private void hideTVNoDevicesFound() {
         this.tvNoDevicesFound.setVisibility(View.GONE);
     }
-    private void enableConnectButton(){
+
+    private void enableConnectButton() {
         this.connectButton.setEnabled(true);
     }
-    private void disableConnectButton(){
+
+    private void disableConnectButton() {
         this.connectButton.setEnabled(false);
     }
 
