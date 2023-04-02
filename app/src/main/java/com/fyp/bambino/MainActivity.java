@@ -3,8 +3,9 @@ package com.fyp.bambino;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.app.FragmentTransaction;
+import android.bluetooth.BluetoothSocket;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 
@@ -29,7 +30,7 @@ public class MainActivity extends AppCompatActivity {
         currentButton.setSelected(true);
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
         setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoFragment());
-        setupNavButton(findViewById(R.id.btn_config), new ConfigFragment());
+        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment){
@@ -45,5 +46,21 @@ public class MainActivity extends AppCompatActivity {
                 currentButton = (ImageButton) view;
             }
         });
+    }
+
+    public void goToConfigFragmentStep2(){
+        // Create an instance of the second fragment.
+        ConfigFragmentStep2 configFragmentStep2 = new ConfigFragmentStep2();
+
+//        // Pass the BluetoothSocket instance to the second fragment as an argument.
+//        Bundle args = new Bundle();
+//        args.putParcelable("bluetoothSocket", socket);
+//        configFragmentStep2.setArguments(args);
+
+        // Replace the current fragment with the second fragment.
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container_view, configFragmentStep2)
+                .commit();
     }
 }

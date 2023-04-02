@@ -1,19 +1,11 @@
 package com.fyp.bambino;
 
-import static androidx.core.content.ContextCompat.getSystemService;
-
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
-import android.bluetooth.BluetoothGattCallback;
 import android.bluetooth.BluetoothManager;
-import android.bluetooth.BluetoothProfile;
 import android.bluetooth.BluetoothSocket;
-import android.bluetooth.le.BluetoothLeScanner;
-import android.bluetooth.le.ScanCallback;
-import android.bluetooth.le.ScanResult;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,7 +13,6 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.ColorStateList;
-import android.graphics.Color;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -50,17 +41,15 @@ import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link ConfigFragment#newInstance} factory method to
+ * Use the {@link ConfigFragmentStep1#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class ConfigFragment extends Fragment {
+public class ConfigFragmentStep1 extends Fragment {
 
     private ProgressBar bluetoothProgressBar;
     private RadioGroup bluetoothDevicesRadioGroup;
@@ -91,7 +80,7 @@ public class ConfigFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public ConfigFragment() {
+    public ConfigFragmentStep1() {
         // Required empty public constructor
     }
 
@@ -104,8 +93,8 @@ public class ConfigFragment extends Fragment {
      * @return A new instance of fragment ConfigFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static ConfigFragment newInstance(String param1, String param2) {
-        ConfigFragment fragment = new ConfigFragment();
+    public static ConfigFragmentStep1 newInstance(String param1, String param2) {
+        ConfigFragmentStep1 fragment = new ConfigFragmentStep1();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -127,7 +116,7 @@ public class ConfigFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View rootView = inflater.inflate(R.layout.fragment_config, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_config_step1, container, false);
 
         initUI(rootView);
         requestLocationPermission();
@@ -180,6 +169,7 @@ public class ConfigFragment extends Fragment {
                                 socket.connect();
                                 OutputStream outputStream = socket.getOutputStream();
                                 outputStream.write("Bambino App Connected!".getBytes());
+                                ((MainActivity)getActivity()).goToConfigFragmentStep2();
                             } catch (IOException e) {
                                 Toast.makeText(getContext(), "Failed to connect to this device!", Toast.LENGTH_LONG).show();
                             }
@@ -192,6 +182,7 @@ public class ConfigFragment extends Fragment {
     }
 
     private void requestLocationPermission() {
+
         ActivityResultLauncher<String> requestPermissionLauncher =
                 registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
                     if (!isGranted) {
