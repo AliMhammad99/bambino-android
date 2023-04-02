@@ -48,48 +48,115 @@
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="250dp">
+                android:layout_height="300dp">
 
                 <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="165dp"
+                    android:layout_height="wrap_content"
                     android:scrollbarThumbVertical="@color/beige">
 
-                    <!--                    <com.google.android.material.textfield.TextInputEditText-->
-                    <!--                        android:layout_width="match_parent"-->
-                    <!--                        android:layout_height="match_parent"-->
-                    <!--                        android:hint="Wi-Fi Name"-->
-                    <!--                        android:textColorHint="@color/gray"-->
-                    <!--                        android:fontFamily="@font/gotham_medium"-->
-                    <!--                        android:height="50dp"-->
-                    <!--                        android:background="@drawable/shp_btn_back_enabled"-->
-                    <!--                        android:drawableStart="@drawable/ic_refresh"-->
-                    <!--                        android:drawableWidth="24dp"-->
-                    <!--                        />-->
-                    <RelativeLayout
+                    <LinearLayout
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content">
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
 
-
-                        <EditText
+                        <RelativeLayout
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:layout_centerVertical="true"
-                            android:height="50dp"
-                            android:background="@drawable/shp_btn_back_enabled"
-                            android:fontFamily="@font/gotham_medium"
-                            android:hint="Wi-Fi Name"
-                            android:paddingLeft="55dp"
-                            android:textColorHint="@color/gray" />
+                            android:layout_height="wrap_content">
 
-                        <ImageView
-                            android:layout_width="30dp"
-                            android:layout_height="30dp"
-                            android:layout_centerVertical="true"
-                            android:layout_marginLeft="15dp"
-                            android:src="@drawable/ic_refresh" />
-                    </RelativeLayout>
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:background="@drawable/shp_btn_back_enabled"
+                                android:padding="10dp" />
 
+                            <EditText
+                                android:id="@+id/et_wifi_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerVertical="true"
+                                android:layout_marginHorizontal="4dp"
+                                android:height="45dp"
+
+                                android:background="@drawable/shp_edit_text"
+                                android:fontFamily="@font/gotham_medium"
+                                android:hint="Wi-Fi Name"
+                                android:paddingLeft="50dp"
+                                android:textColor="@color/gray"
+                                android:textColorHint="@color/white_gray" />
+
+                            <ImageView
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="15dp"
+                                android:src="@drawable/ic_wifi"
+                                app:tint="@color/gray" />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:background="@drawable/shp_btn_back_enabled"
+                                android:padding="10dp" />
+
+                            <EditText
+                                android:id="@+id/et_wifi_password"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:layout_centerVertical="true"
+                                android:layout_marginHorizontal="4dp"
+                                android:height="45dp"
+                                android:background="@drawable/shp_edit_text"
+                                android:fontFamily="@font/gotham_medium"
+                                android:hint="Wi-Fi Password"
+                                android:inputType="textPassword"
+                                android:minHeight="45dp"
+                                android:paddingLeft="50dp"
+                                android:textColor="@color/gray"
+                                android:textColorHint="@color/white_gray" />
+
+                            <ImageView
+                                android:layout_width="25dp"
+                                android:layout_height="25dp"
+                                android:layout_centerVertical="true"
+                                android:layout_marginLeft="15dp"
+                                android:src="@drawable/ic_password"
+                                app:tint="@color/gray" />
+                        </RelativeLayout>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="15dp">
+
+                            <View
+                                android:layout_width="match_parent"
+                                android:layout_height="52dp"
+                                android:background="@drawable/shp_btn_back_enabled"
+                                android:padding="10dp" />
+
+                            <Spinner
+                                android:id="@+id/spinner_mode"
+                                android:layout_width="match_parent"
+                                android:layout_height="45dp"
+                                android:layout_centerVertical="true"
+                                android:layout_marginHorizontal="4dp"
+                                android:height="45dp"
+                                android:background="@drawable/shp_edit_text"
+
+                                android:paddingLeft="43dp"
+                                android:spinnerMode="dialog"
+
+                                />
+                            <!--                            android:entries="@array/spinner_mode_options"-->
+                        </RelativeLayout>
+                    </LinearLayout>
                 </ScrollView>
 
                 <Button
@@ -102,7 +169,7 @@
                     android:fontFamily="@font/gotham_bold"
                     android:foreground="@drawable/rpl_btn_back"
                     android:stateListAnimator="@null"
-                    android:text="Connect"
+                    android:text="CONFIRM"
                     android:textSize="20sp"
                     app:backgroundTint="@null" />
             </FrameLayout>

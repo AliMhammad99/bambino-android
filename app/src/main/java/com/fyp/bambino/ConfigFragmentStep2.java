@@ -20,8 +20,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Spinner;
+import android.widget.SpinnerAdapter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
@@ -31,6 +34,8 @@ import java.util.Set;
  * create an instance of this fragment.
  */
 public class ConfigFragmentStep2 extends Fragment {
+
+    private Spinner modeSpinner;
 
 
 
@@ -79,8 +84,19 @@ public class ConfigFragmentStep2 extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_config_step2, container, false);
-
+        initUI(rootView);
         return rootView;
+    }
+
+    private void initUI(View view){
+        this.modeSpinner = view.findViewById(R.id.spinner_mode);
+        final List<String> states = Arrays.asList("Local","Remote");
+
+        // Our custom Adapter class that we created
+        SpinnerAdapter adapter = new Sp(getActivity().getApplicationContext(), states);
+        adapter.setDropDownViewResource(R.layout.my_dropdown_item);
+
+        spinner.setAdapter(adapter);
     }
 
 }
