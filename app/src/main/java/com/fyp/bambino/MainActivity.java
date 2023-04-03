@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("mode", "0");
         editor.apply();
-        setupNavigation();
+
 
         LinearLayout navigation = findViewById(R.id.navigation);
 
@@ -44,6 +44,7 @@ public class MainActivity extends AppCompatActivity {
         });
 
         loadModeFromSharedPreferences();
+        setupNavigation();
     }
 
     private void setupNavigation() {
