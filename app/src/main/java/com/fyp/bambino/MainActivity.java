@@ -5,6 +5,8 @@ import androidx.fragment.app.Fragment;
 
 import android.app.FragmentTransaction;
 import android.bluetooth.BluetoothSocket;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -16,6 +18,7 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton currentButton;
+    private static String mode = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,17 +33,18 @@ public class MainActivity extends AppCompatActivity {
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
             @Override
             public void onVisibilityChanged(boolean isOpen) {
-                if(isOpen){
+                if (isOpen) {
                     navigation.setVisibility(View.GONE);
-                }else{
+                } else {
                     navigation.setVisibility(View.VISIBLE);
                 }
             }
         });
 
+        loadModeFromSharedPreferences();
     }
 
-    private void setupNavigation(){
+    private void setupNavigation() {
         currentButton = findViewById(R.id.btn_dashboard);
         currentButton.setSelected(true);
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
@@ -48,7 +52,7 @@ public class MainActivity extends AppCompatActivity {
         setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
     }
 
-    private void setupNavButton(ImageButton navButton, Fragment fragment){
+    private void setupNavButton(ImageButton navButton, Fragment fragment) {
         navButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -63,7 +67,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void goToConfigFragmentStep2(){
+    public void goToConfigFragmentStep2() {
         // Create an instance of the second fragment.
         ConfigFragmentStep2 configFragmentStep2 = new ConfigFragmentStep2();
 
@@ -77,5 +81,26 @@ public class MainActivity extends AppCompatActivity {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, configFragmentStep2)
                 .commit();
+    }
+
+    private void loadModeFromSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
+        MainActivity.mode = sharedPreferences.getString("mode", "");
+
+    }
+    public static boolean noConnectedDevice(){
+        return MainActivity.mode.equals("");
+    }
+
+    public static String getMode(){
+        return MainActivity.mode;
+    }
+
+    public static void setMode(String mode){
+        MainActivity.mode = mode;
+    }
+
+    public void reSetupNavigation(){
+
     }
 }

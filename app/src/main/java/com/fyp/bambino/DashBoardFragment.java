@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -14,6 +15,8 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class DashBoardFragment extends Fragment {
+
+    private TextView tvNoConnectedDevice;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -59,6 +62,15 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dash_board, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
+        initUI(rootView);
+        return rootView;
+    }
+
+    private void initUI(View view){
+        this.tvNoConnectedDevice = view.findViewById(R.id.tv_no_connected_device);
+        if(MainActivity.noConnectedDevice()){
+            this.tvNoConnectedDevice.setVisibility(View.VISIBLE);
+        }
     }
 }

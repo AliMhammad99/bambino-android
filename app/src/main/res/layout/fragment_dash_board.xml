@@ -25,7 +25,8 @@
         android:gravity="center"
         android:text="No Connected Device."
         android:textColor="@color/gray"
-        android:textSize="20sp" />
+        android:textSize="20sp"
+        android:visibility="gone"/>
 
 
 </FrameLayout>

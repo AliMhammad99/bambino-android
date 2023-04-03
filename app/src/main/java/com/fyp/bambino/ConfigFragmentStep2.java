@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -176,15 +177,18 @@ public class ConfigFragmentStep2 extends Fragment {
 
                 OutputStream outputStream = null;
                 try {
-                    Log.i("SOCKET", String.valueOf(ConfigFragmentStep1.socket));
-                    Log.i("OUTPUT STREAM", String.valueOf(ConfigFragmentStep1.socket.getOutputStream()));
+
                     outputStream = ConfigFragmentStep1.socket.getOutputStream();
                     outputStream.write(wifiName.getBytes());
                     outputStream.write(wifiPassword.getBytes());
                     outputStream.write(mode.getBytes());
                     showSuccessFeedbackMessage("Successful!");
+                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("bambino", Context.MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
+                    editor.apply();
+                    MainActivity.setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
                 } catch (IOException e) {
-//                    Toast.makeText(getContext(), "Failed to connect to your device!", Toast.LENGTH_LONG).show();
                     showErrorFeedbackMessage("Connection Failed!");
                     enableConfirmButton();
                 }
