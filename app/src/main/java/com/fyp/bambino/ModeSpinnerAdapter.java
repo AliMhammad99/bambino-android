@@ -43,8 +43,6 @@ public class ModeSpinnerAdapter extends ArrayAdapter<String> {
         // Image and TextViews
         TextView state = row.findViewById(R.id.text);
         // Get flag image from drawables folder
-//        Resources res = context.getResources();
-
 
         //Set state abbreviation and state flag
         state.setText(items.get(position));

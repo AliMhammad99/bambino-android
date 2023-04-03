@@ -3,8 +3,11 @@ package com.fyp.bambino;
 import android.Manifest;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.net.wifi.ScanResult;
 import android.net.wifi.WifiManager;
@@ -12,17 +15,25 @@ import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
+import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -35,8 +46,10 @@ import java.util.Set;
  */
 public class ConfigFragmentStep2 extends Fragment {
 
+    private TextView etWiFiName;
+    private TextView etWiFiPassword;
     private Spinner modeSpinner;
-
+    private Button confirmButton;
 
 
     // TODO: Rename parameter arguments, choose names that match
@@ -85,19 +98,145 @@ public class ConfigFragmentStep2 extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_config_step2, container, false);
         initUI(rootView);
+        registerBluetoothStateReceiver();
         return rootView;
     }
 
-    private void initUI(View view){
-        this.modeSpinner = view.findViewById(R.id.spinner_mode);
-        final List<String> states = Arrays.asList("Local","Remote");
+    private void initUI(View view) {
+        this.etWiFiName = view.findViewById(R.id.et_wifi_name);
+        this.etWiFiName.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Do something before the text is changed
+            }
 
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Check if the EditText is not empty
+//                if (etWiFiName.getText().length() != 0) {
+//                    // Do something if the EditText is not empty
+//
+//                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Do something after the text has been changed
+                if (inputsEmpty()) {
+                    disableConfirmButton();
+                } else {
+                    enableConfirmButton();
+                }
+            }
+        });
+        this.etWiFiPassword = view.findViewById(R.id.et_wifi_password);
+        this.etWiFiPassword.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Do something before the text is changed
+            }
+
+            @Override
+            public void onTextChanged(CharSequence charSequence, int i, int i1, int i2) {
+                // Check if the EditText is not empty
+//                if (etWiFiName.getText().length() != 0) {
+//                    // Do something if the EditText is not empty
+//
+//                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable editable) {
+                // Do something after the text has been changed
+                if (inputsEmpty()) {
+                    disableConfirmButton();
+                } else {
+                    enableConfirmButton();
+                }
+            }
+        });
+
+        this.modeSpinner = view.findViewById(R.id.spinner_mode);
+        final List<String> states = Arrays.asList("Local", "Remote");
 
         // Our custom Adapter class that we created
         SpinnerAdapter adapter = new ModeSpinnerAdapter(this.getContext(), states);
-//        adapter.setDropDownViewResource(R.layout.spinner_dropdown_item_layout);
-
         this.modeSpinner.setAdapter(adapter);
+        this.modeSpinner.setPopupBackgroundResource(R.color.white);
+
+        this.confirmButton = view.findViewById(R.id.btn_confirm);
+        this.confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                String wifiName = etWiFiName.getText().toString()+" \n";
+                String wifiPassword = etWiFiPassword.getText().toString()+" \n";
+                String mode = String.valueOf(modeSpinner.getSelectedItemPosition())+" \n";
+
+                OutputStream outputStream = null;
+                try {
+                    Log.i("SOCKET", String.valueOf(ConfigFragmentStep1.socket));
+                    Log.i("OUTPUT STREAM", String.valueOf(ConfigFragmentStep1.socket.getOutputStream()));
+                    outputStream = ConfigFragmentStep1.socket.getOutputStream();
+                    outputStream.write(wifiName.getBytes());
+                    outputStream.write(wifiPassword.getBytes());
+                    outputStream.write(mode.getBytes());
+                } catch (IOException e) {
+                    Toast.makeText(getContext(), "Failed to connect to your device!", Toast.LENGTH_LONG).show();
+                }
+
+            }
+        });
     }
 
+    private boolean inputsEmpty() {
+        return this.etWiFiName.getText().length() == 0 || this.etWiFiPassword.getText().length() == 0;
+    }
+
+    private void enableConfirmButton() {
+        this.confirmButton.setEnabled(true);
+    }
+
+    private void disableConfirmButton() {
+        this.confirmButton.setEnabled(false);
+    }
+
+    private void registerBluetoothStateReceiver() {
+        IntentFilter filter = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+        BluetoothStateReceiver bluetoothStateReceiver = new BluetoothStateReceiver();
+        this.getActivity().registerReceiver(bluetoothStateReceiver, filter);
+    }
+
+    private class BluetoothStateReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            String action = intent.getAction();
+            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+                int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, BluetoothAdapter.ERROR);
+                if (state == BluetoothAdapter.STATE_OFF) {
+                    // Bluetooth has been turned off
+                    exitAppPopUpMessage();
+                }
+            }
+        }
+    }
+
+    private void exitAppPopUpMessage() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
+        builder.setMessage("You turned Off bluetooth, Bambino will close now.");
+        builder.setTitle("Bluetooth Turned Off");
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // do something when the OK button is clicked
+                closeApp();
+            }
+        });
+        builder.setCancelable(false);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void closeApp() {
+        this.getActivity().finish();
+    }
 }

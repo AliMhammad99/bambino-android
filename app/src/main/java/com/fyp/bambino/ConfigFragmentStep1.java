@@ -167,12 +167,14 @@ public class ConfigFragmentStep1 extends Fragment {
                             }
 
                             try {
+                                disableConnectButton();
                                 socket = currentBluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
                                 socket.connect();
                                 OutputStream outputStream = socket.getOutputStream();
                                 outputStream.write("Bambino App Connected!".getBytes());
                                 ((MainActivity) getActivity()).goToConfigFragmentStep2();
                             } catch (IOException e) {
+                                enableConnectButton();
                                 Toast.makeText(getContext(), "Failed to connect to this device!", Toast.LENGTH_LONG).show();
                             }
                         }

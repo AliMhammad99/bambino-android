@@ -45,7 +45,7 @@ public class MainActivity extends AppCompatActivity {
         currentButton.setSelected(true);
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
         setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoFragment());
-        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep2());
+        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment){
