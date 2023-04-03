@@ -1,6 +1,7 @@
 package com.fyp.bambino;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -57,6 +58,7 @@ public class ConfigFragmentStep1 extends Fragment {
     private TextView tvNoDevicesFound;
     private boolean noDevicesFound = true;
     private Button connectButton;
+    private TextView tvFeedbackMessage;
     public static BluetoothManager bluetoothManager;
     public static BluetoothAdapter bluetoothAdapter;
 
@@ -141,6 +143,7 @@ public class ConfigFragmentStep1 extends Fragment {
         this.refreshButton = view.findViewById(R.id.btn_refresh);
         this.tvNoDevicesFound = view.findViewById(R.id.tv_no_devices_found);
         this.connectButton = view.findViewById(R.id.btn_connect);
+        this.tvFeedbackMessage = view.findViewById(R.id.tv_feedback_message);
         this.refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -157,6 +160,8 @@ public class ConfigFragmentStep1 extends Fragment {
             @Override
             public void onClick(View view) {
                 if (currentBluetoothDevice != null) {
+                    disableConnectButton();
+                    showSuccessFeedbackMessage("Connecting...");
                     new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
@@ -167,15 +172,18 @@ public class ConfigFragmentStep1 extends Fragment {
                             }
 
                             try {
-                                disableConnectButton();
+
                                 socket = currentBluetoothDevice.createRfcommSocketToServiceRecord(MY_UUID);
                                 socket.connect();
                                 OutputStream outputStream = socket.getOutputStream();
                                 outputStream.write("Bambino App Connected!".getBytes());
+
                                 ((MainActivity) getActivity()).goToConfigFragmentStep2();
+
                             } catch (IOException e) {
                                 enableConnectButton();
-                                Toast.makeText(getContext(), "Failed to connect to this device!", Toast.LENGTH_LONG).show();
+//                                Toast.makeText(getContext(), "Failed to connect to this device!", Toast.LENGTH_LONG).show();
+                                showErrorFeedbackMessage("Connection Failed!");
                             }
                         }
                     }, 100);
@@ -454,5 +462,23 @@ public class ConfigFragmentStep1 extends Fragment {
 
     private void closeApp() {
         this.getActivity().finish();
+    }
+
+
+    private void showSuccessFeedbackMessage(String message) {
+        this.tvFeedbackMessage.setText(message);
+        this.tvFeedbackMessage.setTextColor(ContextCompat.getColor(this.getContext(), R.color.green));
+        this.tvFeedbackMessage.setVisibility(View.VISIBLE);
+    }
+
+
+    private void showErrorFeedbackMessage(String message) {
+        this.tvFeedbackMessage.setText(message);
+        this.tvFeedbackMessage.setTextColor(ContextCompat.getColor(this.getContext(), R.color.red));
+        this.tvFeedbackMessage.setVisibility(View.VISIBLE);
+    }
+
+    private void hideFeedbackMessage() {
+        this.tvFeedbackMessage.setVisibility(View.GONE);
     }
 }

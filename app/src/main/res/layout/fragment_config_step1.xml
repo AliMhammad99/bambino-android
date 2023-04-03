@@ -141,23 +141,39 @@
                     </RadioGroup>
                 </ScrollView>
 
-                <TextView
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="Connecting"
-                <Button
-                    android:id="@+id/btn_connect"
-                    android:layout_width="match_parent"
-                    android:layout_height="50dp"
                     android:layout_gravity="bottom|right"
-                    android:background="@drawable/slc_btn_background"
-                    android:enabled="false"
-                    android:fontFamily="@font/gotham_bold"
-                    android:foreground="@drawable/rpl_btn_back"
-                    android:stateListAnimator="@null"
-                    android:text="Connect"
-                    android:textSize="20sp"
-                    app:backgroundTint="@null" />
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/tv_feedback_message"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="bottom"
+                        android:text="Connecting..."
+                        android:visibility="gone"
+                        android:textColor="@color/green"
+                        android:layout_marginBottom="14dp"
+                        android:gravity="center_horizontal"
+                        android:fontFamily="@font/gotham_book"
+                        android:textSize="20sp"/>
+
+                    <Button
+                        android:id="@+id/btn_connect"
+                        android:layout_width="match_parent"
+                        android:layout_height="50dp"
+
+                        android:background="@drawable/slc_btn_background"
+                        android:enabled="false"
+                        android:fontFamily="@font/gotham_bold"
+                        android:foreground="@drawable/rpl_btn_back"
+                        android:stateListAnimator="@null"
+                        android:text="Connect"
+                        android:textSize="20sp"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
             </FrameLayout>
         </LinearLayout>
     </ScrollView>

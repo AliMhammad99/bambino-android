@@ -50,7 +50,7 @@ public class ConfigFragmentStep2 extends Fragment {
     private TextView etWiFiPassword;
     private Spinner modeSpinner;
     private Button confirmButton;
-
+    private TextView tvFeedbackMessage;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -168,6 +168,8 @@ public class ConfigFragmentStep2 extends Fragment {
         this.confirmButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                disableConfirmButton();
+                showSuccessFeedbackMessage("Confirming...");
                 String wifiName = etWiFiName.getText().toString()+" \n";
                 String wifiPassword = etWiFiPassword.getText().toString()+" \n";
                 String mode = String.valueOf(modeSpinner.getSelectedItemPosition())+" \n";
@@ -180,12 +182,17 @@ public class ConfigFragmentStep2 extends Fragment {
                     outputStream.write(wifiName.getBytes());
                     outputStream.write(wifiPassword.getBytes());
                     outputStream.write(mode.getBytes());
+                    showSuccessFeedbackMessage("Successful!");
                 } catch (IOException e) {
-                    Toast.makeText(getContext(), "Failed to connect to your device!", Toast.LENGTH_LONG).show();
+//                    Toast.makeText(getContext(), "Failed to connect to your device!", Toast.LENGTH_LONG).show();
+                        showErrorFeedbackMessage("Connection Failed!");
+                        enableConfirmButton();
                 }
 
             }
         });
+
+        this.tvFeedbackMessage = view.findViewById(R.id.tv_feedback_message);
     }
 
     private boolean inputsEmpty() {
@@ -238,5 +245,18 @@ public class ConfigFragmentStep2 extends Fragment {
 
     private void closeApp() {
         this.getActivity().finish();
+    }
+
+    private void showSuccessFeedbackMessage(String message) {
+        this.tvFeedbackMessage.setText(message);
+        this.tvFeedbackMessage.setTextColor(ContextCompat.getColor(this.getContext(), R.color.green));
+        this.tvFeedbackMessage.setVisibility(View.VISIBLE);
+    }
+
+
+    private void showErrorFeedbackMessage(String message) {
+        this.tvFeedbackMessage.setText(message);
+        this.tvFeedbackMessage.setTextColor(ContextCompat.getColor(this.getContext(), R.color.red));
+        this.tvFeedbackMessage.setVisibility(View.VISIBLE);
     }
 }
