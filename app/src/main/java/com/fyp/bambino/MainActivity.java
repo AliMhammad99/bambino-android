@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import android.app.FragmentTransaction;
-import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -25,7 +24,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
-
+        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("mode", "0");
+        editor.apply();
         setupNavigation();
 
         LinearLayout navigation = findViewById(R.id.navigation);
@@ -47,8 +49,11 @@ public class MainActivity extends AppCompatActivity {
     private void setupNavigation() {
         currentButton = findViewById(R.id.btn_dashboard);
         currentButton.setSelected(true);
-        setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
-        setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoFragment());
+
+        if(noConnectedDevice()) {
+            setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardNoCDFragment());
+            setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoNoCDFragment());
+        }
         setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
     }
 
@@ -98,6 +103,10 @@ public class MainActivity extends AppCompatActivity {
 
     public static void setMode(String mode){
         MainActivity.mode = mode;
+    }
+
+    public static boolean isLocalMode(){
+        return MainActivity.mode.equals("0");
     }
 
     public void reSetupNavigation(){

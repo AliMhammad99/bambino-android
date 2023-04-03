@@ -29,10 +29,10 @@ import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link LiveVideoFragment#newInstance} factory method to
+ * Use the {@link LiveVideoRemoteFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LiveVideoFragment extends Fragment {
+public class LiveVideoRemoteFragment extends Fragment {
 //    private Handler handler;
 //    private Runnable runnable;
 
@@ -58,7 +58,7 @@ public class LiveVideoFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public LiveVideoFragment() {
+    public LiveVideoRemoteFragment() {
         // Required empty public constructor
     }
 
@@ -71,8 +71,8 @@ public class LiveVideoFragment extends Fragment {
      * @return A new instance of fragment LiveVideoFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static LiveVideoFragment newInstance(String param1, String param2) {
-        LiveVideoFragment fragment = new LiveVideoFragment();
+    public static LiveVideoRemoteFragment newInstance(String param1, String param2) {
+        LiveVideoRemoteFragment fragment = new LiveVideoRemoteFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -92,7 +92,7 @@ public class LiveVideoFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View rootView = inflater.inflate(R.layout.fragment_live_video, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_live_video_remote, container, false);
 
         headerTextView = rootView.findViewById(R.id.header_text_view);
         imageView = rootView.findViewById(R.id.live_video);

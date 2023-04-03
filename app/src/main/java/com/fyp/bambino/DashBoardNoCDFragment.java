@@ -10,10 +10,12 @@ import android.view.ViewGroup;
 
 /**
  * A simple {@link Fragment} subclass.
- * Use the {@link DashBoardFragment#newInstance} factory method to
+ * Use the {@link DashBoardNoCDFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class DashBoardFragment extends Fragment {
+public class DashBoardNoCDFragment extends Fragment {
+
+//    private TextView tvNoConnectedDevice;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,7 +26,7 @@ public class DashBoardFragment extends Fragment {
     private String mParam1;
     private String mParam2;
 
-    public DashBoardFragment() {
+    public DashBoardNoCDFragment() {
         // Required empty public constructor
     }
 
@@ -37,8 +39,8 @@ public class DashBoardFragment extends Fragment {
      * @return A new instance of fragment DashBoardFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static DashBoardFragment newInstance(String param1, String param2) {
-        DashBoardFragment fragment = new DashBoardFragment();
+    public static DashBoardNoCDFragment newInstance(String param1, String param2) {
+        DashBoardNoCDFragment fragment = new DashBoardNoCDFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
@@ -59,6 +61,15 @@ public class DashBoardFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_dash_board, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_dash_board_no_cd, container, false);
+//        initUI(rootView);
+        return rootView;
     }
+
+//    private void initUI(View view){
+//        this.tvNoConnectedDevice = view.findViewById(R.id.tv_no_connected_device);
+//        if(MainActivity.noConnectedDevice()){
+//            this.tvNoConnectedDevice.setVisibility(View.VISIBLE);
+//        }
+//    }
 }

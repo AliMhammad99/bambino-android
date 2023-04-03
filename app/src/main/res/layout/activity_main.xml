@@ -20,10 +20,10 @@
 
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container_view"
-            android:name="com.fyp.bambino.DashBoardFragment"
+            android:name="com.fyp.bambino.DashBoardNoCDFragment"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            tools:layout="@layout/fragment_live_video" />
+            tools:layout="@layout/fragment_dash_board_no_cd" />
 
 
         <LinearLayout
