@@ -75,6 +75,8 @@ public class ConfigFragmentStep1 extends Fragment {
 
     private BluetoothDevice currentBluetoothDevice;
 
+    private boolean isScanReceiverRegistered = false;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -134,7 +136,8 @@ public class ConfigFragmentStep1 extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        this.getActivity().unregisterReceiver(scanReceiver);
+        if (isScanReceiverRegistered)
+            this.getActivity().unregisterReceiver(scanReceiver);
     }
 
     private void initUI(View view) {
@@ -223,6 +226,7 @@ public class ConfigFragmentStep1 extends Fragment {
         IntentFilter startDiscoveryFilter = new IntentFilter(BluetoothAdapter.ACTION_DISCOVERY_STARTED);
         this.getActivity().registerReceiver(scanReceiver, startDiscoveryFilter);
 
+        isScanReceiverRegistered = true;
     }
 
     private BroadcastReceiver scanReceiver = new BroadcastReceiver() {
@@ -445,19 +449,21 @@ public class ConfigFragmentStep1 extends Fragment {
     }
 
     private void exitAppPopUpMessage() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-        builder.setMessage("You turned Off bluetooth, Bambino will close now.");
-        builder.setTitle("Bluetooth Turned Off");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // do something when the OK button is clicked
-                closeApp();
-            }
-        });
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        if (this.getActivity() != null && !getActivity().isFinishing()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+            builder.setMessage("You turned Off bluetooth, Bambino will close now.");
+            builder.setTitle("Bluetooth Turned Off");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // do something when the OK button is clicked
+                    closeApp();
+                }
+            });
+            builder.setCancelable(false);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
     private void closeApp() {
