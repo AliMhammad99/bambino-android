@@ -23,8 +23,7 @@
         android:id="@+id/live_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:src="@drawable/image" />
+        android:scaleType="centerCrop" />
 
     <TextView
         android:id="@+id/header_text_view"
@@ -51,6 +50,9 @@
         android:id="@+id/btn_flash"
         android:layout_width="38dp"
         android:layout_height="38dp"
+        android:layout_gravity="bottom|right"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="95dp"
         android:backgroundTint="#00000000"
         android:focusable="true"
         android:foreground="@drawable/rpl_btn_back"
@@ -58,10 +60,6 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_flash_off"
         android:tooltipText="Flash On/Off"
-        android:layout_gravity="bottom|right"
-        android:layout_marginBottom="95dp"
-        android:layout_marginRight="20dp"
-        app:tint="@color/white"
-        />
+        android:visibility="gone" />
 
 </FrameLayout>

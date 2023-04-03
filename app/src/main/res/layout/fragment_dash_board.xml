@@ -9,25 +9,23 @@
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="20dp"
         android:fontFamily="@font/gotham_bold"
         android:text="Dashboard"
         android:textColor="@color/gray"
         android:textSize="28sp"
-        android:layout_margin="20dp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/tv_no_connected_device"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="No Connected Device."
         android:layout_gravity="center"
-        android:gravity="center"
         android:fontFamily="@font/gotham_medium"
-        android:textSize="20sp"
+        android:gravity="center"
+        android:text="No Connected Device."
         android:textColor="@color/gray"
-        />
-
+        android:textSize="20sp" />
 
 
 </FrameLayout>
