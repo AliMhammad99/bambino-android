@@ -16,6 +16,15 @@
         android:layout_margin="20dp"
         android:textStyle="bold" />
 
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No Connected Device."
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:fontFamily="@font/gotham_medium"
+        android:textSize="22sp"
+        />
 
 
 
