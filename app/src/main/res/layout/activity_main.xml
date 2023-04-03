@@ -23,7 +23,7 @@
             android:name="com.fyp.bambino.DashBoardFragment"
             android:layout_width="fill_parent"
             android:layout_height="match_parent"
-            tools:layout="@layout/fragment_dash_board" />
+            tools:layout="@layout/fragment_live_video" />
 
 
         <LinearLayout

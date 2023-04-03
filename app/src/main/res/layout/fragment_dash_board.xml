@@ -17,13 +17,15 @@
         android:textStyle="bold" />
 
     <TextView
+        android:id="@+id/tv_no_connected_device"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="No Connected Device."
         android:layout_gravity="center"
         android:gravity="center"
         android:fontFamily="@font/gotham_medium"
-        android:textSize="22sp"
+        android:textSize="20sp"
+        android:textColor="@color/gray"
         />
 
 

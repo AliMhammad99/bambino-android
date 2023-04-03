@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Matrix;
 import android.os.Bundle;
 
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.os.Handler;
@@ -12,6 +13,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -44,6 +46,9 @@ public class LiveVideoFragment extends Fragment {
     private String setFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/set_flash_led.php?flashLED=";
 
     private ProgressBar progressBar;
+
+    private ImageButton flashButton;
+    private boolean flashOn = false;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -96,6 +101,8 @@ public class LiveVideoFragment extends Fragment {
 
         progressBar = rootView.findViewById(R.id.progressBar);
 
+        this.flashButton = rootView.findViewById(R.id.btn_flash);
+
         final Handler handler = new Handler();
         Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {
@@ -113,6 +120,17 @@ public class LiveVideoFragment extends Fragment {
         // Schedule the timer to run every 1 second
         timer.schedule(timerTask, 0, 1000);
 
+        this.flashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (flashOn) {
+                    flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_off));
+                } else {
+                    flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_on));
+                }
+            }
+        });
+
         // Create the handler and runnable for the repeating task
 //        handler = new Handler();
 //        runnable = new Runnable() {
@@ -129,6 +147,7 @@ public class LiveVideoFragment extends Fragment {
         return rootView;
 
     }
+
     private void getImageFromServer() {
         ImageRequest imageRequest = new ImageRequest(imageUrl,
                 new Response.Listener<Bitmap>() {

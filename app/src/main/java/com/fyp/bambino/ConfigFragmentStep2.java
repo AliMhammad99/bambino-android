@@ -170,9 +170,9 @@ public class ConfigFragmentStep2 extends Fragment {
             public void onClick(View view) {
                 disableConfirmButton();
                 showSuccessFeedbackMessage("Confirming...");
-                String wifiName = etWiFiName.getText().toString()+" \n";
-                String wifiPassword = etWiFiPassword.getText().toString()+" \n";
-                String mode = String.valueOf(modeSpinner.getSelectedItemPosition())+" \n";
+                String wifiName = etWiFiName.getText().toString() + " \n";
+                String wifiPassword = etWiFiPassword.getText().toString() + " \n";
+                String mode = String.valueOf(modeSpinner.getSelectedItemPosition()) + " \n";
 
                 OutputStream outputStream = null;
                 try {
@@ -185,8 +185,8 @@ public class ConfigFragmentStep2 extends Fragment {
                     showSuccessFeedbackMessage("Successful!");
                 } catch (IOException e) {
 //                    Toast.makeText(getContext(), "Failed to connect to your device!", Toast.LENGTH_LONG).show();
-                        showErrorFeedbackMessage("Connection Failed!");
-                        enableConfirmButton();
+                    showErrorFeedbackMessage("Connection Failed!");
+                    enableConfirmButton();
                 }
 
             }
@@ -228,19 +228,21 @@ public class ConfigFragmentStep2 extends Fragment {
     }
 
     private void exitAppPopUpMessage() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this.getContext());
-        builder.setMessage("You turned Off bluetooth, Bambino will close now.");
-        builder.setTitle("Bluetooth Turned Off");
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                // do something when the OK button is clicked
-                closeApp();
-            }
-        });
-        builder.setCancelable(false);
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        if (this.getActivity() != null && !getActivity().isFinishing()) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this.getActivity());
+            builder.setMessage("You turned Off bluetooth, Bambino will close now.");
+            builder.setTitle("Bluetooth Turned Off");
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    // do something when the OK button is clicked
+                    closeApp();
+                }
+            });
+            builder.setCancelable(false);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+        }
     }
 
     private void closeApp() {
