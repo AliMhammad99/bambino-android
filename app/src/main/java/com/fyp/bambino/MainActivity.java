@@ -17,17 +17,17 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 public class MainActivity extends AppCompatActivity {
 
     private ImageButton currentButton;
-    private static String mode = "";
+    private String mode = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
-        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("mode", "0");
-        editor.apply();
+//        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("mode", "1");
+//        editor.apply();
 
 
         LinearLayout navigation = findViewById(R.id.navigation);
@@ -51,9 +51,18 @@ public class MainActivity extends AppCompatActivity {
         currentButton = findViewById(R.id.btn_dashboard);
         currentButton.setSelected(true);
 
-        if(noConnectedDevice()) {
+        if (noConnectedDevice()) {
             setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardNoCDFragment());
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoNoCDFragment());
+        } else {
+            DashBoardFragment dashBoardFragment = new DashBoardFragment();
+            setCurrentFragment(dashBoardFragment);
+            setupNavButton(findViewById(R.id.btn_dashboard), dashBoardFragment);
+            if (this.isLocalMode()) {
+                setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
+            } else {
+                setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
+            }
         }
         setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
     }
@@ -83,34 +92,46 @@ public class MainActivity extends AppCompatActivity {
 //        configFragmentStep2.setArguments(args);
 
         // Replace the current fragment with the second fragment.
-        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, configFragmentStep2)
                 .commit();
     }
 
+    private void setCurrentFragment(Fragment fragment) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container_view, fragment)
+                .commit();
+    }
+
     private void loadModeFromSharedPreferences() {
         SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
-        MainActivity.mode = sharedPreferences.getString("mode", "");
+        this.mode = sharedPreferences.getString("mode", "");
 
     }
-    public static boolean noConnectedDevice(){
-        return MainActivity.mode.equals("");
+
+    private boolean noConnectedDevice() {
+        return this.mode.equals("");
     }
 
-    public static String getMode(){
-        return MainActivity.mode;
+//    public static String getMode() {
+//        return MainActivity.mode;
+//    }
+
+    public void setMode(String mode) {
+        this.mode = mode;
     }
 
-    public static void setMode(String mode){
-        MainActivity.mode = mode;
+    private boolean isLocalMode() {
+        return this.mode.equals("0");
     }
 
-    public static boolean isLocalMode(){
-        return MainActivity.mode.equals("0");
-    }
-
-    public void reSetupNavigation(){
-
+    public void updateNavigation() {
+        setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
+        if (this.isLocalMode()) {
+            setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
+        } else {
+            setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
+        }
     }
 }

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/gray"
     tools:context=".LiveVideoRemoteFragment">
 
     <!-- TODO: Update blank fragment layout -->
@@ -22,8 +23,9 @@
         android:layout_margin="20dp"
         android:fontFamily="@font/gotham_bold"
         android:text="Live Video"
+        android:textColor="@color/white"
 
-        android:textColor="@color/gray"
+
         android:textSize="28sp"
         android:textStyle="bold" />
 
@@ -50,6 +52,6 @@
         android:scaleType="centerInside"
         android:src="@drawable/ic_flash_off"
         android:tooltipText="Flash On/Off"
-        android:visibility="gone" />
+      />
 
 </FrameLayout>

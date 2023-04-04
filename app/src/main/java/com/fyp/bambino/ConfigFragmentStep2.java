@@ -187,7 +187,8 @@ public class ConfigFragmentStep2 extends Fragment {
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
                     editor.apply();
-                    MainActivity.setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
+                    ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
+                    ((MainActivity)getActivity()).updateNavigation();
                 } catch (IOException e) {
                     showErrorFeedbackMessage("Connection Failed!");
                     enableConfirmButton();

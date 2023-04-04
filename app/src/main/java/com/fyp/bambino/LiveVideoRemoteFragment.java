@@ -37,7 +37,6 @@ public class LiveVideoRemoteFragment extends Fragment {
 //    private Runnable runnable;
 
 
-    private TextView headerTextView;
     private ImageView imageView;
     private RequestQueue requestQueue;
     private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
@@ -94,7 +93,6 @@ public class LiveVideoRemoteFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_live_video_remote, container, false);
 
-        headerTextView = rootView.findViewById(R.id.header_text_view);
         imageView = rootView.findViewById(R.id.live_video);
         requestQueue = Volley.newRequestQueue(this.getContext());
 
@@ -163,7 +161,6 @@ public class LiveVideoRemoteFragment extends Fragment {
                         progressBar.setVisibility(View.GONE);
 
                         imageView.setImageBitmap(rotatedBitmap);
-                        headerTextView.setTextColor(Color.WHITE);
                     }
                 }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
                 new Response.ErrorListener() {
