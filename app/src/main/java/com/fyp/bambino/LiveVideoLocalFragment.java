@@ -96,16 +96,31 @@ public class LiveVideoLocalFragment extends Fragment {
         Thread thread = new Thread(streamThread);
         thread.start();
 
-        FlashLEDThread flashLEDThread = new FlashLEDThread();
-        Thread thread1 = new Thread(flashLEDThread);
-        thread1.start();
+//        FlashLEDThread flashLEDThread = new FlashLEDThread();
+//        Thread thread1 = new Thread(flashLEDThread);
+//        thread1.start();
 
         this.flashButton = rootView.findViewById(R.id.btn_flash);
         flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if(!LiveVideoLocalService.flashUpdating) {
+                if (!LiveVideoLocalService.flashUpdating) {
                     LiveVideoLocalService.flashUpdating = true;
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            // Perform network operation here
+                            if (flashOn) {
+                                turnFlashOff();
+                                flashOn = false;
+                            } else {
+                                turnFlashOn();
+                                flashOn = true;
+                            }
+                        }
+                    }).start();
+
+
                 }
             }
         });
@@ -228,5 +243,61 @@ public class LiveVideoLocalFragment extends Fragment {
 
     private void hideProgressBar() {
         this.progressBar.setVisibility(View.GONE);
+    }
+
+    private void turnFlashOn() {
+        if (LiveVideoLocalService.flashUpdating) {
+
+            String flash_url = localURL + "/flash_on";
+
+            try {
+
+                URL url = new URL(flash_url);
+
+                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                huc.setRequestMethod("GET");
+                huc.setConnectTimeout(1000 * 5);
+                huc.setReadTimeout(1000 * 5);
+                huc.setDoInput(true);
+                huc.connect();
+                if (huc.getResponseCode() == 200) {
+                    flashButton.setImageResource(R.drawable.ic_flash_on);
+                    huc.disconnect();
+                    LiveVideoLocalService.flashUpdating = false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
+    }
+
+    private void turnFlashOff() {
+        if (LiveVideoLocalService.flashUpdating) {
+
+            String flash_url = localURL + "/flash_off";
+
+            try {
+
+                URL url = new URL(flash_url);
+
+                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                huc.setRequestMethod("GET");
+                huc.setConnectTimeout(1000 * 5);
+                huc.setReadTimeout(1000 * 5);
+                huc.setDoInput(true);
+                huc.connect();
+                if (huc.getResponseCode() == 200) {
+                    flashButton.setImageResource(R.drawable.ic_flash_off);
+                    huc.disconnect();
+                    LiveVideoLocalService.flashUpdating = false;
+                }
+
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+        }
     }
 }
