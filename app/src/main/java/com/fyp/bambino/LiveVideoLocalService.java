@@ -36,7 +36,8 @@ public class LiveVideoLocalService extends Service {
     RemoteViews customForegroundNotificationView;
     Notification.Builder foregroundNotification;
 
-    Bitmap currentFrameBitmap;
+    public static Bitmap currentFrameBitmap;
+    public static boolean flashUpdating = false;
     private String localURL = "http://192.168.0.107:80";
 
     @Override
@@ -74,84 +75,86 @@ public class LiveVideoLocalService extends Service {
             @Override
             public void run() {
                 while (true) {
+                    if (!flashUpdating) {
 //                    Log.i("Service Running ", String.valueOf(counter));
-                    counter++;
-                    customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
-                    foregroundNotification.setCustomContentView(customForegroundNotificationView);
-                    startForeground(1001, foregroundNotification.build());
-                    BufferedInputStream bis = null;
-                    FileOutputStream fos = null;
-                    try {
-
-                        URL url = new URL(localURL);
-
+                        counter++;
+                        customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
+                        foregroundNotification.setCustomContentView(customForegroundNotificationView);
+                        startForeground(1001, foregroundNotification.build());
+                        BufferedInputStream bis = null;
+                        FileOutputStream fos = null;
                         try {
-                            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                            huc.setRequestMethod("GET");
-                            huc.setConnectTimeout(1000 * 5);
-                            huc.setReadTimeout(1000 * 5);
-                            huc.setDoInput(true);
-                            huc.connect();
 
-                            if (huc.getResponseCode() == 200) {
+                            URL url = new URL(localURL);
 
-                                InputStream in = huc.getInputStream();
+                            try {
+                                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                                huc.setRequestMethod("GET");
+                                huc.setConnectTimeout(1000 * 5);
+                                huc.setReadTimeout(1000 * 5);
+                                huc.setDoInput(true);
+                                huc.connect();
 
-                                InputStreamReader isr = new InputStreamReader(in);
-                                BufferedReader br = new BufferedReader(isr);
+                                if (huc.getResponseCode() == 200) {
 
-                                String data;
+                                    InputStream in = huc.getInputStream();
 
-                                int len;
-                                byte[] buffer;
+                                    InputStreamReader isr = new InputStreamReader(in);
+                                    BufferedReader br = new BufferedReader(isr);
 
-                                while ((data = br.readLine()) != null) {
-                                    if (data.contains("Content-Type:")) {
-                                        data = br.readLine();
+                                    String data;
 
-                                        len = Integer.parseInt(data.split(":")[1].trim());
+                                    int len;
+                                    byte[] buffer;
 
-                                        bis = new BufferedInputStream(in);
-                                        buffer = new byte[len];
+                                    while ((data = br.readLine()) != null && !flashUpdating) {
+                                        if (data.contains("Content-Type:")) {
+                                            data = br.readLine();
 
-                                        int t = 0;
-                                        while (t < len) {
-                                            t += bis.read(buffer, t, len - t);
+                                            len = Integer.parseInt(data.split(":")[1].trim());
+
+                                            bis = new BufferedInputStream(in);
+                                            buffer = new byte[len];
+
+                                            int t = 0;
+                                            while (t < len) {
+                                                t += bis.read(buffer, t, len - t);
+                                            }
+
+                                            Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+
+                                            final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                                            Matrix matrix = new Matrix();
+
+                                            matrix.postRotate(90);
+                                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                                            currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+
+
                                         }
-
-                                        Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-
-//                                        final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-//                                        Matrix matrix = new Matrix();
-//
-//                                        matrix.postRotate(90);
-//                                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-//
-//                                        currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
 
                                     }
-
-
                                 }
-                            }
 
-                        } catch (IOException e) {
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        } catch (MalformedURLException e) {
                             e.printStackTrace();
-                        }
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (bis != null) {
-                                bis.close();
-                            }
-                            if (fos != null) {
-                                fos.close();
-                            }
+                        } finally {
+                            try {
+                                if (bis != null) {
+                                    bis.close();
+                                }
+                                if (fos != null) {
+                                    fos.close();
+                                }
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
                 }

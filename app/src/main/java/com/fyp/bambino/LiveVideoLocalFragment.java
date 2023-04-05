@@ -42,7 +42,7 @@ public class LiveVideoLocalFragment extends Fragment {
 
     private boolean updatingFlashState = false;
 
-    private String localURL = "http://192.168.0.101:80";
+    private String localURL = "http://192.168.0.107:80";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -95,19 +95,21 @@ public class LiveVideoLocalFragment extends Fragment {
         StreamThread streamThread = new StreamThread();
         Thread thread = new Thread(streamThread);
         thread.start();
-//
-//        FlashLEDThread flashLEDThread = new FlashLEDThread();
-//        Thread thread1 = new Thread(flashLEDThread);
-//        thread1.start();
-//
-//        this.flashButton = rootView.findViewById(R.id.btn_flash);
-//        flashButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                updatingFlashState = true;
-//            }
-//        });
-fragmentActivity = getActivity();
+
+        FlashLEDThread flashLEDThread = new FlashLEDThread();
+        Thread thread1 = new Thread(flashLEDThread);
+        thread1.start();
+
+        this.flashButton = rootView.findViewById(R.id.btn_flash);
+        flashButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(!LiveVideoLocalService.flashUpdating) {
+                    LiveVideoLocalService.flashUpdating = true;
+                }
+            }
+        });
+        fragmentActivity = getActivity();
         this.progressBar = rootView.findViewById(R.id.progressBar);
 
         return rootView;
@@ -134,25 +136,25 @@ fragmentActivity = getActivity();
             while (true) {
 
 
-//                if (activity != null) {
+                if (fragmentActivity != null) {
 
                     final Bitmap responseBitmap = BitmapFactory.decodeFile(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-                    Matrix matrix = new Matrix();
-
-                    matrix.postRotate(90);
+//                    Matrix matrix = new Matrix();
+//
+//                    matrix.postRotate(90);
                     if (responseBitmap != null) {
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-
-                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+//                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+//
+//                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
                         fragmentActivity.runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
                                 hideProgressBar();
-                                ivLiveVideo.setImageBitmap(rotatedBitmap);
+                                ivLiveVideo.setImageBitmap(LiveVideoLocalService.currentFrameBitmap);
                             }
                         });
-
                     }
+                }
 //                }
             }
 
@@ -168,7 +170,7 @@ fragmentActivity = getActivity();
         @Override
         public void run() {
             while (true) {
-                if (updatingFlashState) {
+                if (LiveVideoLocalService.flashUpdating) {
                     flashOn ^= true;
 
                     String flash_url;
@@ -193,19 +195,27 @@ fragmentActivity = getActivity();
                         } else {
                             flashButton.setImageResource(R.drawable.ic_flash_off);
                         }
+//                        huc.getResponseCode();
                         if (huc.getResponseCode() == 200) {
                             InputStream in = huc.getInputStream();
 
                             InputStreamReader isr = new InputStreamReader(in);
                             BufferedReader br = new BufferedReader(isr);
-
+                            huc.disconnect();
+                            LiveVideoLocalService.flashUpdating = false;
                         }
 
                     } catch (Exception e) {
+//                        LiveVideoLocalService.flashUpdating = false;
                         e.printStackTrace();
                     }
-                    updatingFlashState = false;
+
                 }
+//                try {
+//                    Thread.sleep(1000);
+//                } catch (InterruptedException e) {
+////                    throw new RuntimeException(e);
+//                }
             }
         }
 
