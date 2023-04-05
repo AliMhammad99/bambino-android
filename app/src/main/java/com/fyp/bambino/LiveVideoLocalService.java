@@ -38,6 +38,7 @@ public class LiveVideoLocalService extends Service {
         NotificationChannel notificationChannel = null;
         // Create a PendingIntent for when the notification is clicked
         Intent notificationIntent = new Intent(this, MainActivity.class);
+        notificationIntent.putExtra(MainActivity.LIVE_VIDEO_LOCAL_FRAGMENT_ID, "1");
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         RemoteViews remoteViews = new RemoteViews(getPackageName(), R.layout.layout_live_video_foreground_service);
         // Set the maximum height of the custom view to match the notification height

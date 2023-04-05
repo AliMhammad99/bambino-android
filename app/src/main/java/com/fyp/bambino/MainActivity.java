@@ -22,6 +22,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton currentButton;
     private String mode = "";
     public static final String LIVE_VIDEO_LOCAL_FRAGMENT_ID = "1";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,12 +33,11 @@ public class MainActivity extends AppCompatActivity {
 //        editor.putString("mode", "1");
 //        editor.apply();
         if (getIntent().hasExtra(LIVE_VIDEO_LOCAL_FRAGMENT_ID)) {
-            int fragmentId = getIntent().getIntExtra(LIVE_VIDEO_LOCAL_FRAGMENT_ID, -1);
-            if (fragmentId != -1) {
-                Fragment fragment = // create the fragment based on the ID
-                        getSupportFragmentManager().beginTransaction()
-                                .replace(R.id.fragment_container_view, fragment)
-                                .commit();
+            String fragmentId = getIntent().getStringExtra(LIVE_VIDEO_LOCAL_FRAGMENT_ID);
+            if (fragmentId.equals(LIVE_VIDEO_LOCAL_FRAGMENT_ID)) {
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.fragment_container_view, new LiveVideoLocalFragment())
+                        .commit();
             }
         }
         Intent serviceIntent = new Intent(this, LiveVideoLocalService.class);
@@ -151,10 +151,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public boolean liveVideoLocalServiceRunning(){
+    public boolean liveVideoLocalServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for(ActivityManager.RunningServiceInfo service:activityManager.getRunningServices(Integer.MAX_VALUE)){
-            if(LiveVideoLocalService.class.getName().equals(service.service.getClassName())){
+        for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (LiveVideoLocalService.class.getName().equals(service.service.getClassName())) {
                 return true;
             }
         }
