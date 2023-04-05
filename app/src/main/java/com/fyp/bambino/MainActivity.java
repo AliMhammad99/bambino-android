@@ -3,9 +3,12 @@ package com.fyp.bambino;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.app.ActivityManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageButton;
@@ -18,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
 
     private ImageButton currentButton;
     private String mode = "";
-
+    public static final String LIVE_VIDEO_LOCAL_FRAGMENT_ID = "1";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -28,6 +31,19 @@ public class MainActivity extends AppCompatActivity {
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
 //        editor.putString("mode", "1");
 //        editor.apply();
+        if (getIntent().hasExtra(LIVE_VIDEO_LOCAL_FRAGMENT_ID)) {
+            int fragmentId = getIntent().getIntExtra(LIVE_VIDEO_LOCAL_FRAGMENT_ID, -1);
+            if (fragmentId != -1) {
+                Fragment fragment = // create the fragment based on the ID
+                        getSupportFragmentManager().beginTransaction()
+                                .replace(R.id.fragment_container_view, fragment)
+                                .commit();
+            }
+        }
+        Intent serviceIntent = new Intent(this, LiveVideoLocalService.class);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            startForegroundService(serviceIntent);
+        }
 
 
         LinearLayout navigation = findViewById(R.id.navigation);
@@ -133,5 +149,15 @@ public class MainActivity extends AppCompatActivity {
         } else {
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
         }
+    }
+
+    public boolean liveVideoLocalServiceRunning(){
+        ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        for(ActivityManager.RunningServiceInfo service:activityManager.getRunningServices(Integer.MAX_VALUE)){
+            if(LiveVideoLocalService.class.getName().equals(service.service.getClassName())){
+                return true;
+            }
+        }
+        return false;
     }
 }

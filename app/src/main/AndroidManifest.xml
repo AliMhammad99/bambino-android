@@ -11,9 +11,12 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-
-    <uses-feature android:name="android.hardware.bluetooth" android:required="true"/>
+    <uses-feature
+        android:name="android.hardware.bluetooth"
+        android:required="true" />
 
     <application
         android:allowBackup="true"
@@ -29,8 +32,8 @@
             android:exported="false" />
         <activity
             android:name=".SplashScreen"
-            android:windowSoftInputMode="adjustResize"
-            android:exported="true">
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +41,19 @@
             </intent-filter>
         </activity>
 
+        <service
+            android:name=".LiveVideoLocalService"
+            android:enabled="true"
+            android:exported="false"></service>
+        <receiver
+            android:name=".RebootBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED">
 
+                </action>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

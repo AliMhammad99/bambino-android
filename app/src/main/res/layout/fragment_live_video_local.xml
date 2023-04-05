@@ -42,8 +42,8 @@
         android:id="@+id/btn_flash"
         android:layout_width="38dp"
         android:layout_height="38dp"
-        android:layout_gravity="bottom|right"
-        android:layout_marginRight="20dp"
+        android:layout_gravity="bottom|center_horizontal"
+
         android:layout_marginBottom="95dp"
         android:backgroundTint="#00000000"
         android:focusable="true"
