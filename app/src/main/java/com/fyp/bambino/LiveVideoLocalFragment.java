@@ -6,6 +6,7 @@ import android.graphics.Matrix;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import android.os.Environment;
 import android.util.Log;
@@ -33,7 +34,7 @@ import java.net.URL;
  * create an instance of this fragment.
  */
 public class LiveVideoLocalFragment extends Fragment {
-
+    private FragmentActivity fragmentActivity;
     private ImageView ivLiveVideo;
     private ImageButton flashButton;
     private ProgressBar progressBar;
@@ -94,19 +95,19 @@ public class LiveVideoLocalFragment extends Fragment {
         StreamThread streamThread = new StreamThread();
         Thread thread = new Thread(streamThread);
         thread.start();
-
-        FlashLEDThread flashLEDThread = new FlashLEDThread();
-        Thread thread1 = new Thread(flashLEDThread);
-        thread1.start();
-
-        this.flashButton = rootView.findViewById(R.id.btn_flash);
-        flashButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updatingFlashState = true;
-            }
-        });
-
+//
+//        FlashLEDThread flashLEDThread = new FlashLEDThread();
+//        Thread thread1 = new Thread(flashLEDThread);
+//        thread1.start();
+//
+//        this.flashButton = rootView.findViewById(R.id.btn_flash);
+//        flashButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                updatingFlashState = true;
+//            }
+//        });
+fragmentActivity = getActivity();
         this.progressBar = rootView.findViewById(R.id.progressBar);
 
         return rootView;
@@ -131,95 +132,36 @@ public class LiveVideoLocalFragment extends Fragment {
         @Override
         public void run() {
             while (true) {
-                if (!updatingFlashState) {
-//                    String stream_url = "http://192.168.0.101:80";
-
-                    BufferedInputStream bis = null;
-                    FileOutputStream fos = null;
-                    try {
-
-                        URL url = new URL(localURL);
-
-                        try {
-                            HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                            huc.setRequestMethod("GET");
-                            huc.setConnectTimeout(1000 * 5);
-                            huc.setReadTimeout(1000 * 5);
-                            huc.setDoInput(true);
-                            huc.connect();
-
-                            if (huc.getResponseCode() == 200) {
-
-                                InputStream in = huc.getInputStream();
-
-                                InputStreamReader isr = new InputStreamReader(in);
-                                BufferedReader br = new BufferedReader(isr);
-
-                                String data;
-
-                                int len;
-                                byte[] buffer;
-
-                                while ((data = br.readLine()) != null && !updatingFlashState) {
-                                    if (data.contains("Content-Type:")) {
-                                        data = br.readLine();
-
-                                        len = Integer.parseInt(data.split(":")[1].trim());
-
-                                        bis = new BufferedInputStream(in);
-                                        buffer = new byte[len];
-
-                                        int t = 0;
-                                        while (t < len) {
-                                            t += bis.read(buffer, t, len - t);
-                                        }
-                                        if (getActivity() != null) {
-                                            Bytes2ImageFile(buffer, getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-
-                                            final Bitmap responseBitmap = BitmapFactory.decodeFile(getActivity().getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-                                            Matrix matrix = new Matrix();
-
-                                            matrix.postRotate(90);
-                                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-
-                                            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                                            getActivity().runOnUiThread(new Runnable() {
-                                                @Override
-                                                public void run() {
-                                                    hideProgressBar();
-                                                    ivLiveVideo.setImageBitmap(rotatedBitmap);
-                                                }
-                                            });
-
-                                        }
-                                    }
 
 
-                                }
+//                if (activity != null) {
+
+                    final Bitmap responseBitmap = BitmapFactory.decodeFile(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                    Matrix matrix = new Matrix();
+
+                    matrix.postRotate(90);
+                    if (responseBitmap != null) {
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                        fragmentActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                hideProgressBar();
+                                ivLiveVideo.setImageBitmap(rotatedBitmap);
                             }
+                        });
 
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
-                    } catch (MalformedURLException e) {
-                        e.printStackTrace();
-                    } finally {
-                        try {
-                            if (bis != null) {
-                                bis.close();
-                            }
-                            if (fos != null) {
-                                fos.close();
-                            }
-
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        }
                     }
-                }
+//                }
             }
+
+
         }
+
+
     }
+
 
     private class FlashLEDThread implements Runnable {
 
@@ -266,7 +208,9 @@ public class LiveVideoLocalFragment extends Fragment {
                 }
             }
         }
+
     }
+
 
     private void showProgressBar() {
         this.progressBar.setVisibility(View.VISIBLE);
