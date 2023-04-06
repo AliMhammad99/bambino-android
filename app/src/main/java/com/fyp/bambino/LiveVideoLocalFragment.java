@@ -168,23 +168,25 @@ public class LiveVideoLocalFragment extends Fragment {
                     continue;
                 }
 
+                File file = new File(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0A.jpg");
+//                 Bitmap responseBitmap = BitmapFactory.decodeFile(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                if (file.exists()) {
+                    final Bitmap responseBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
+                    // process the bitmap
 
-                final Bitmap responseBitmap = BitmapFactory.decodeFile(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-//                    Matrix matrix = new Matrix();
-//
-//                    matrix.postRotate(90);
-                if (responseBitmap != null) {
+                    if (responseBitmap != null) {
 //                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
 //
 //                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                    fragmentActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            showFlashButton();
-                            hideProgressBar();
-                            ivLiveVideo.setImageBitmap(LiveVideoLocalService.currentFrameBitmap);
-                        }
-                    });
+                        fragmentActivity.runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                showFlashButton();
+                                hideProgressBar();
+                                ivLiveVideo.setImageBitmap(LiveVideoLocalService.currentFrameBitmap);
+                            }
+                        });
+                    }
                 }
 
 //                }
