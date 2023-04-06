@@ -42,6 +42,7 @@ public class LiveVideoLocalService extends Service {
     public static boolean flashUpdating = false;
     public static boolean connectionLost = false;
     private String localURL = "http://192.168.43.239:80";
+    private volatile boolean shouldStop = false;
 
     @Override
     public void onCreate() {
@@ -77,7 +78,7 @@ public class LiveVideoLocalService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (true) {
+                while (!shouldStop) {
                     if (!flashUpdating) {
 //                    Log.i("Service Running ", String.valueOf(counter));
                         counter++;
@@ -193,4 +194,10 @@ public class LiveVideoLocalService extends Service {
             e.printStackTrace();
         }
     }
+
+    public void stopService() {
+        Log.i("3. STOP SERVICE ----------------------","");
+        shouldStop = true;
+    }
+
 }

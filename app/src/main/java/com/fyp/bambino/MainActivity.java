@@ -1,6 +1,7 @@
 package com.fyp.bambino;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.app.ActivityManager;
@@ -10,6 +11,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
@@ -31,16 +33,14 @@ public class MainActivity extends AppCompatActivity {
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
 //        editor.putString("mode", "0");
 //        editor.apply();
-
-        if (!liveVideoLocalServiceRunning()) {
-            Intent serviceIntent = new Intent(this, LiveVideoLocalService.class);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                startForegroundService(serviceIntent);
-            }
-        }
+        initUI();
+        loadModeFromSharedPreferences();
+        setupMode();
 
 
+    }
+
+    private void initUI() {
         LinearLayout navigation = findViewById(R.id.navigation);
 
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
@@ -53,12 +53,17 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
-
-        loadModeFromSharedPreferences();
-        setupNavigation();
     }
 
-    private void setupNavigation() {
+    private void loadModeFromSharedPreferences() {
+        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
+
+        this.mode = sharedPreferences.getString("mode", "");
+        Log.i("MODE IN MAIN: ", this.mode);
+
+    }
+
+    private void setupMode() {
         currentButton = findViewById(R.id.btn_dashboard);
         currentButton.setSelected(true);
 
@@ -71,11 +76,14 @@ public class MainActivity extends AppCompatActivity {
             setupNavButton(findViewById(R.id.btn_dashboard), dashBoardFragment);
             if (this.isLocalMode()) {
                 setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
+                startLiveVideoLocalService();
             } else {
                 setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
+                startLiveVideoRemoteService();
             }
         }
         setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
+        stopLiveVideoLocalService();
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment) {
@@ -91,6 +99,35 @@ public class MainActivity extends AppCompatActivity {
                 currentButton = (ImageButton) view;
             }
         });
+    }
+
+    private void startLiveVideoLocalService() {
+        if (!liveVideoLocalServiceRunning()) {
+            Intent serviceIntent = new Intent(this, LiveVideoLocalService.class);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startForegroundService(serviceIntent);
+            }
+        }
+    }
+
+    private void stopLiveVideoLocalService() {
+        Log.i("1. STOP SERVICE ----------------------","");
+        Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
+        LiveVideoLocalService liveVideoLocalService = (LiveVideoLocalService) ContextCompat.getSystemService(this, LiveVideoLocalService.class);
+        if (liveVideoLocalService != null) {
+            Log.i("2. STOP SERVICE ----------------------","");
+            liveVideoLocalService.stopService();
+            stopService(stopIntent);
+        }
+    }
+
+    private void startLiveVideoRemoteService() {
+        Log.i("REMOTE LIVE VIDEO SERVICE IS RUNNING", "");
+    }
+
+    private void stopLiveVideoRemoteService(){
+        Log.i("REMOTE LIVE VIDEO SERVICE IS STOPPING", "");
     }
 
     public void goToConfigFragmentStep2() {
@@ -115,11 +152,6 @@ public class MainActivity extends AppCompatActivity {
                 .commit();
     }
 
-    private void loadModeFromSharedPreferences() {
-        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
-        this.mode = sharedPreferences.getString("mode", "");
-
-    }
 
     private boolean noConnectedDevice() {
         return this.mode.equals("");

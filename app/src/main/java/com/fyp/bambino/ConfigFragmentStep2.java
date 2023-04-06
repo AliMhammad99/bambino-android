@@ -176,24 +176,32 @@ public class ConfigFragmentStep2 extends Fragment {
                 String mode = String.valueOf(modeSpinner.getSelectedItemPosition()) + " \n";
 
                 OutputStream outputStream = null;
-                try {
-
-                    outputStream = ConfigFragmentStep1.socket.getOutputStream();
-                    outputStream.write(wifiName.getBytes());
-                    outputStream.write(wifiPassword.getBytes());
-                    outputStream.write(mode.getBytes());
-                    showSuccessFeedbackMessage("Successful!");
-                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("bambino", Context.MODE_PRIVATE);
-                    SharedPreferences.Editor editor = sharedPreferences.edit();
-                    Log.i("MODE:  ", String.valueOf(modeSpinner.getSelectedItemPosition()));
-                    editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
-                    editor.apply();
-                    ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
-                    ((MainActivity)getActivity()).updateNavigation();
-                } catch (IOException e) {
-                    showErrorFeedbackMessage("Connection Failed!");
-                    enableConfirmButton();
-                }
+                showSuccessFeedbackMessage("Successful!");
+                SharedPreferences sharedPreferences = getActivity().getSharedPreferences("bambino", Context.MODE_PRIVATE);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                Log.i("MODE:  ", String.valueOf(modeSpinner.getSelectedItemPosition()));
+                editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
+                editor.apply();
+                ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
+                ((MainActivity)getActivity()).updateNavigation();
+//                try {
+//
+//                    outputStream = ConfigFragmentStep1.socket.getOutputStream();
+//                    outputStream.write(wifiName.getBytes());
+//                    outputStream.write(wifiPassword.getBytes());
+//                    outputStream.write(mode.getBytes());
+//                    showSuccessFeedbackMessage("Successful!");
+//                    SharedPreferences sharedPreferences = getActivity().getSharedPreferences("bambino", Context.MODE_PRIVATE);
+//                    SharedPreferences.Editor editor = sharedPreferences.edit();
+//                    Log.i("MODE:  ", String.valueOf(modeSpinner.getSelectedItemPosition()));
+//                    editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
+//                    editor.apply();
+//                    ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
+//                    ((MainActivity)getActivity()).updateNavigation();
+//                } catch (IOException e) {
+//                    showErrorFeedbackMessage("Connection Failed!");
+//                    enableConfirmButton();
+//                }
 
             }
         });
