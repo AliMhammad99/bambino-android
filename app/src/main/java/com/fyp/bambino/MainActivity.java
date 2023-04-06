@@ -29,7 +29,7 @@ public class MainActivity extends AppCompatActivity {
         getSupportActionBar().hide();
 //        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
 //        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString("mode", "1");
+//        editor.putString("mode", "0");
 //        editor.apply();
 
         if (!liveVideoLocalServiceRunning()) {

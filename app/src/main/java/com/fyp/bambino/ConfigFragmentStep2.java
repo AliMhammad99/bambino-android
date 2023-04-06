@@ -185,6 +185,7 @@ public class ConfigFragmentStep2 extends Fragment {
                     showSuccessFeedbackMessage("Successful!");
                     SharedPreferences sharedPreferences = getActivity().getSharedPreferences("bambino", Context.MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
+                    Log.i("MODE:  ", String.valueOf(modeSpinner.getSelectedItemPosition()));
                     editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
                     editor.apply();
                     ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));

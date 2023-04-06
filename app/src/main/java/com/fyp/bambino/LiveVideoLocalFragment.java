@@ -42,7 +42,7 @@ public class LiveVideoLocalFragment extends Fragment {
 
     private boolean updatingFlashState = false;
 
-    private String localURL = "http://192.168.0.107:80";
+    private String localURL = "http://192.168.43.239:80";
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -90,6 +90,8 @@ public class LiveVideoLocalFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_live_video_local, container, false);
         this.ivLiveVideo = rootView.findViewById(R.id.live_video);
+        fragmentActivity = getActivity();
+        this.progressBar = rootView.findViewById(R.id.progressBar);
 
 
         StreamThread streamThread = new StreamThread();
@@ -124,8 +126,6 @@ public class LiveVideoLocalFragment extends Fragment {
                 }
             }
         });
-        fragmentActivity = getActivity();
-        this.progressBar = rootView.findViewById(R.id.progressBar);
 
         return rootView;
     }
@@ -151,25 +151,42 @@ public class LiveVideoLocalFragment extends Fragment {
             while (true) {
 
 
-                if (fragmentActivity != null) {
+                if (LiveVideoLocalService.connectionLost) {
 
-                    final Bitmap responseBitmap = BitmapFactory.decodeFile(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                    fragmentActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            hideFlashButton();
+                            showProgressBar();
+                        }
+                    });
+                    try {
+                        Thread.sleep(2000);
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
+                    }
+                    continue;
+                }
+
+
+                final Bitmap responseBitmap = BitmapFactory.decodeFile(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
 //                    Matrix matrix = new Matrix();
 //
 //                    matrix.postRotate(90);
-                    if (responseBitmap != null) {
+                if (responseBitmap != null) {
 //                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
 //
 //                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                        fragmentActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                hideProgressBar();
-                                ivLiveVideo.setImageBitmap(LiveVideoLocalService.currentFrameBitmap);
-                            }
-                        });
-                    }
+                    fragmentActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            showFlashButton();
+                            hideProgressBar();
+                            ivLiveVideo.setImageBitmap(LiveVideoLocalService.currentFrameBitmap);
+                        }
+                    });
                 }
+
 //                }
             }
 
@@ -243,6 +260,14 @@ public class LiveVideoLocalFragment extends Fragment {
 
     private void hideProgressBar() {
         this.progressBar.setVisibility(View.GONE);
+    }
+
+    private void hideFlashButton() {
+        this.flashButton.setVisibility(View.GONE);
+    }
+
+    private void showFlashButton() {
+        this.flashButton.setVisibility(View.VISIBLE);
     }
 
     private void turnFlashOn() {

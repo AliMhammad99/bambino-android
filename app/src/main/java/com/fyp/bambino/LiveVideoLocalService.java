@@ -25,8 +25,10 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 
 public class LiveVideoLocalService extends Service {
@@ -38,7 +40,8 @@ public class LiveVideoLocalService extends Service {
 
     public static Bitmap currentFrameBitmap;
     public static boolean flashUpdating = false;
-    private String localURL = "http://192.168.0.107:80";
+    public static boolean connectionLost = false;
+    private String localURL = "http://192.168.43.239:80";
 
     @Override
     public void onCreate() {
@@ -93,10 +96,11 @@ public class LiveVideoLocalService extends Service {
                                 huc.setConnectTimeout(1000 * 5);
                                 huc.setReadTimeout(1000 * 5);
                                 huc.setDoInput(true);
+
                                 huc.connect();
 
                                 if (huc.getResponseCode() == 200) {
-
+                                    connectionLost = false;
                                     InputStream in = huc.getInputStream();
 
                                     InputStreamReader isr = new InputStreamReader(in);
@@ -139,9 +143,16 @@ public class LiveVideoLocalService extends Service {
                                 }
 
                             } catch (IOException e) {
+                                if (e instanceof SocketTimeoutException || e instanceof ConnectException) {
+                                    // Handle SocketTimeoutException
+                                    Log.i("YESSSSSSSSSSSS", "");
+                                    connectionLost = true;
+
+                                }
+                                Thread.sleep(5000);
                                 e.printStackTrace();
                             }
-                        } catch (MalformedURLException e) {
+                        } catch (MalformedURLException | InterruptedException e) {
                             e.printStackTrace();
                         } finally {
                             try {
