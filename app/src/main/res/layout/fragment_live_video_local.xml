@@ -22,7 +22,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="20dp"
         android:fontFamily="@font/gotham_bold"
-        android:text="Live Video"
+        android:text="Live Video (Local)"
         android:textColor="@color/white"
 
 

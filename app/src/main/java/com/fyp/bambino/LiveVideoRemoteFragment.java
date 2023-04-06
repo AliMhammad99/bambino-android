@@ -115,7 +115,7 @@ public class LiveVideoRemoteFragment extends Fragment {
             }
         };
         // Schedule the timer to run every 1 second
-        timer.schedule(timerTask, 0, 1000);
+        timer.schedule(timerTask, 0, 2000);
 
         this.flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -158,7 +158,7 @@ public class LiveVideoRemoteFragment extends Fragment {
                         Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
 
                         Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                        progressBar.setVisibility(View.GONE);
+                        hideProgressBar();
 
                         imageView.setImageBitmap(rotatedBitmap);
                     }
@@ -166,7 +166,7 @@ public class LiveVideoRemoteFragment extends Fragment {
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Toast.makeText(getActivity(), "Error retrieving image", Toast.LENGTH_SHORT).show();
+                        showProgressBar();
                     }
                 });
 
@@ -178,4 +178,11 @@ public class LiveVideoRemoteFragment extends Fragment {
 //        // Stop the repeating task when the fragment is no longer visible
 //        handler.removeCallbacks(runnable);
 //    }
+
+    private void showProgressBar(){
+        this.progressBar.setVisibility(View.VISIBLE);
+    }
+    private void hideProgressBar(){
+        this.progressBar.setVisibility(View.GONE);
+    }
 }
