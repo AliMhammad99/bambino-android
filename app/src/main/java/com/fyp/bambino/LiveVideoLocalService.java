@@ -42,7 +42,7 @@ public class LiveVideoLocalService extends Service {
     public static boolean flashUpdating = false;
     public static boolean connectionLost = false;
     private String localURL = "http://192.168.43.239:80";
-    private volatile boolean shouldStop = false;
+    private boolean shouldStop = false;
 
     @Override
     public void onCreate() {
@@ -78,94 +78,101 @@ public class LiveVideoLocalService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while (!shouldStop) {
-                    if (!flashUpdating) {
+                if ("stop".equals(intent.getAction())) {
+                    // Stop the service
+                    shouldStop = true;
+                    stopForeground(true);
+                    stopSelf();
+                } else {
+                    while (!shouldStop) {
+                        if (!flashUpdating) {
 //                    Log.i("Service Running ", String.valueOf(counter));
-                        counter++;
-                        customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
-                        foregroundNotification.setCustomContentView(customForegroundNotificationView);
-                        startForeground(1001, foregroundNotification.build());
-                        BufferedInputStream bis = null;
-                        FileOutputStream fos = null;
-                        try {
-
-                            URL url = new URL(localURL);
-
+                            counter++;
+                            customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
+                            foregroundNotification.setCustomContentView(customForegroundNotificationView);
+                            startForeground(1001, foregroundNotification.build());
+                            BufferedInputStream bis = null;
+                            FileOutputStream fos = null;
                             try {
-                                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                                huc.setRequestMethod("GET");
-                                huc.setConnectTimeout(1000 * 5);
-                                huc.setReadTimeout(1000 * 5);
-                                huc.setDoInput(true);
 
-                                huc.connect();
+                                URL url = new URL(localURL);
 
-                                if (huc.getResponseCode() == 200) {
-                                    connectionLost = false;
-                                    InputStream in = huc.getInputStream();
+                                try {
+                                    HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                                    huc.setRequestMethod("GET");
+                                    huc.setConnectTimeout(1000 * 5);
+                                    huc.setReadTimeout(1000 * 5);
+                                    huc.setDoInput(true);
 
-                                    InputStreamReader isr = new InputStreamReader(in);
-                                    BufferedReader br = new BufferedReader(isr);
+                                    huc.connect();
 
-                                    String data;
+                                    if (huc.getResponseCode() == 200) {
+                                        connectionLost = false;
+                                        InputStream in = huc.getInputStream();
 
-                                    int len;
-                                    byte[] buffer;
+                                        InputStreamReader isr = new InputStreamReader(in);
+                                        BufferedReader br = new BufferedReader(isr);
 
-                                    while ((data = br.readLine()) != null && !flashUpdating) {
-                                        if (data.contains("Content-Type:")) {
-                                            data = br.readLine();
+                                        String data;
 
-                                            len = Integer.parseInt(data.split(":")[1].trim());
+                                        int len;
+                                        byte[] buffer;
 
-                                            bis = new BufferedInputStream(in);
-                                            buffer = new byte[len];
+                                        while ((data = br.readLine()) != null && !flashUpdating &&!shouldStop) {
+                                            if (data.contains("Content-Type:")) {
+                                                data = br.readLine();
 
-                                            int t = 0;
-                                            while (t < len) {
-                                                t += bis.read(buffer, t, len - t);
+                                                len = Integer.parseInt(data.split(":")[1].trim());
+
+                                                bis = new BufferedInputStream(in);
+                                                buffer = new byte[len];
+
+                                                int t = 0;
+                                                while (t < len) {
+                                                    t += bis.read(buffer, t, len - t);
+                                                }
+
+                                                Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+
+                                                final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                                                Matrix matrix = new Matrix();
+
+                                                matrix.postRotate(90);
+                                                Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                                                currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+
+
                                             }
-
-                                            Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-
-                                            final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-                                            Matrix matrix = new Matrix();
-
-                                            matrix.postRotate(90);
-                                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-
-                                            currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
 
                                         }
+                                    }
 
+                                } catch (IOException e) {
+                                    if (e instanceof SocketTimeoutException || e instanceof ConnectException) {
+                                        // Handle SocketTimeoutException
+                                        Log.i("YESSSSSSSSSSSS", "");
+                                        connectionLost = true;
 
                                     }
+                                    Thread.sleep(5000);
+                                    e.printStackTrace();
                                 }
-
-                            } catch (IOException e) {
-                                if (e instanceof SocketTimeoutException || e instanceof ConnectException) {
-                                    // Handle SocketTimeoutException
-                                    Log.i("YESSSSSSSSSSSS", "");
-                                    connectionLost = true;
-
-                                }
-                                Thread.sleep(5000);
+                            } catch (MalformedURLException | InterruptedException e) {
                                 e.printStackTrace();
-                            }
-                        } catch (MalformedURLException | InterruptedException e) {
-                            e.printStackTrace();
-                        } finally {
-                            try {
-                                if (bis != null) {
-                                    bis.close();
-                                }
-                                if (fos != null) {
-                                    fos.close();
-                                }
+                            } finally {
+                                try {
+                                    if (bis != null) {
+                                        bis.close();
+                                    }
+                                    if (fos != null) {
+                                        fos.close();
+                                    }
 
-                            } catch (IOException e) {
-                                e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
                             }
                         }
                     }
@@ -195,9 +202,5 @@ public class LiveVideoLocalService extends Service {
         }
     }
 
-    public void stopService() {
-        Log.i("3. STOP SERVICE ----------------------","");
-        shouldStop = true;
-    }
 
 }

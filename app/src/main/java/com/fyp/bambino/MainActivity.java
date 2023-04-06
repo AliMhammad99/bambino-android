@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity {
 
         }
         setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
-        stopLiveVideoLocalService();
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment) {
@@ -113,21 +112,19 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void stopLiveVideoLocalService() {
-        Log.i("1. STOP SERVICE ----------------------","");
+        // Create an intent to stop the service
         Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
-        LiveVideoLocalService liveVideoLocalService = (LiveVideoLocalService) ContextCompat.getSystemService(this, LiveVideoLocalService.class);
-        if (liveVideoLocalService != null) {
-            Log.i("2. STOP SERVICE ----------------------","");
-            liveVideoLocalService.stopService();
-            stopService(stopIntent);
-        }
+        stopIntent.setAction("stop");
+
+        // Start the service with the stop intent
+        startService(stopIntent);
     }
 
     private void startLiveVideoRemoteService() {
         Log.i("REMOTE LIVE VIDEO SERVICE IS RUNNING", "");
     }
 
-    private void stopLiveVideoRemoteService(){
+    private void stopLiveVideoRemoteService() {
         Log.i("REMOTE LIVE VIDEO SERVICE IS STOPPING", "");
     }
 
@@ -135,13 +132,6 @@ public class MainActivity extends AppCompatActivity {
         // Create an instance of the second fragment.
         ConfigFragmentStep2 configFragmentStep2 = new ConfigFragmentStep2();
 
-//        // Pass the BluetoothSocket instance to the second fragment as an argument.
-//        Bundle args = new Bundle();
-//        args.putParcelable("bluetoothSocket", socket);
-//        configFragmentStep2.setArguments(args);
-
-        // Replace the current fragment with the second fragment.
-//        FragmentTransaction transaction = getFragmentManager().beginTransaction();
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container_view, configFragmentStep2)
                 .commit();
@@ -158,10 +148,6 @@ public class MainActivity extends AppCompatActivity {
         return this.mode.equals("");
     }
 
-//    public static String getMode() {
-//        return MainActivity.mode;
-//    }
-
     public void setMode(String mode) {
         this.mode = mode;
     }
@@ -170,11 +156,20 @@ public class MainActivity extends AppCompatActivity {
         return this.mode.equals("0");
     }
 
-    public void updateNavigation() {
+    public void updateMode() {
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
         if (this.isLocalMode()) {
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
         } else {
+            setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
+        }
+        if (this.isLocalMode()) {
+            stopLiveVideoRemoteService();
+            startLiveVideoLocalService();
+            setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
+        } else {
+            stopLiveVideoLocalService();
+            startLiveVideoRemoteService();
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
         }
     }

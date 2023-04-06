@@ -183,7 +183,7 @@ public class ConfigFragmentStep2 extends Fragment {
                 editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
                 editor.apply();
                 ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
-                ((MainActivity)getActivity()).updateNavigation();
+                ((MainActivity)getActivity()).updateMode();
 //                try {
 //
 //                    outputStream = ConfigFragmentStep1.socket.getOutputStream();
