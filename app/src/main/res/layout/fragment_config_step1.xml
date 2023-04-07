@@ -84,7 +84,7 @@
                     android:layout_height="50dp"
                     android:layout_gravity="end"
                     android:backgroundTint="#00000000"
-                    android:foreground="?attr/selectableItemBackgroundBorderless"
+                    android:foreground="@drawable/rpl_btn_back_gray"
                     android:scaleType="centerInside"
                     android:src="@drawable/ic_refresh" />
             </LinearLayout>
@@ -168,7 +168,7 @@
                         android:background="@drawable/slc_btn_background"
                         android:enabled="false"
                         android:fontFamily="@font/gotham_bold"
-                        android:foreground="@drawable/rpl_btn_back"
+                        android:foreground="@drawable/rpl_btn_back_white"
                         android:stateListAnimator="@null"
                         android:text="Connect"
                         android:textSize="20sp"

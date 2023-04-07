@@ -19,15 +19,20 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.Spinner;
 import android.widget.SpinnerAdapter;
 import android.widget.TextView;
@@ -47,8 +52,9 @@ import java.util.Set;
  */
 public class ConfigFragmentStep2 extends Fragment {
 
-    private TextView etWiFiName;
-    private TextView etWiFiPassword;
+    private EditText etWiFiName;
+    private EditText etWiFiPassword;
+    private ImageButton showPasswordButton;
     private Spinner modeSpinner;
     private Button confirmButton;
     private TextView tvFeedbackMessage;
@@ -157,6 +163,24 @@ public class ConfigFragmentStep2 extends Fragment {
             }
         });
 
+        this.showPasswordButton = view.findViewById(R.id.btn_show_password);
+        this.showPasswordButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int inputType = etWiFiPassword.getInputType();
+                int newInputType = inputType ^ InputType.TYPE_TEXT_VARIATION_PASSWORD;
+                int cursorPosition = etWiFiPassword.getSelectionEnd(); // Save cursor position
+                etWiFiPassword.setInputType(newInputType);
+                showPasswordButton.setImageDrawable(ContextCompat.getDrawable(getContext(),
+                        (newInputType & InputType.TYPE_TEXT_VARIATION_PASSWORD) == InputType.TYPE_TEXT_VARIATION_PASSWORD ?
+                                R.drawable.ic_password_hidden : R.drawable.ic_password_visible));
+                etWiFiPassword.setTypeface(ResourcesCompat.getFont(getContext(), R.font.gotham_medium));
+                etWiFiPassword.setTextSize(TypedValue.COMPLEX_UNIT_SP, 17);
+                etWiFiPassword.setSelection(cursorPosition); // Restore cursor position
+            }
+
+        });
+
         this.modeSpinner = view.findViewById(R.id.spinner_mode);
         final List<String> states = Arrays.asList("Local", "Remote");
 
@@ -189,8 +213,8 @@ public class ConfigFragmentStep2 extends Fragment {
                     Log.i("MODE:  ", String.valueOf(modeSpinner.getSelectedItemPosition()));
                     editor.putString("mode", String.valueOf(modeSpinner.getSelectedItemPosition()));
                     editor.apply();
-                    ((MainActivity)getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
-                    ((MainActivity)getActivity()).updateMode();
+                    ((MainActivity) getActivity()).setMode(String.valueOf(modeSpinner.getSelectedItemPosition()));
+                    ((MainActivity) getActivity()).updateMode();
                 } catch (IOException e) {
                     showErrorFeedbackMessage("Connection Failed!");
                     enableConfirmButton();

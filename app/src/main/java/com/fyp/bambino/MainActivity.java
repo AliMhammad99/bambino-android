@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             setupNavButton(findViewById(R.id.btn_dashboard), dashBoardFragment);
 
         }
-        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
+        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep2());
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment) {
