@@ -14,6 +14,8 @@ import android.media.AudioAttributes;
 import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
@@ -53,11 +55,14 @@ public class LiveVideoLocalService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         this.customForegroundNotificationView = new RemoteViews(getPackageName(), R.layout.layout_live_video_foreground_service);
-
+//this.customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop,stopIntent);
+        Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
+        stopIntent.setAction("stop");
+        PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent, 0);
+        customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop, stopPendingIntent);
         // Set the maximum height of the custom view to match the notification height
-        int notificationHeight = getResources().getDimensionPixelSize(android.R.dimen.notification_large_icon_height);
-        this.customForegroundNotificationView.setViewPadding(R.id.notification_layout, 0, 0, 0, notificationHeight);
-        AudioAttributes attributes = null;
+        this.customForegroundNotificationView.setViewPadding(R.id.notification_layout, 0, 0, 0, 0);
+
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
             notificationChannel = new NotificationChannel(CHANNEL_ID, CHANNEL_ID, NotificationManager.IMPORTANCE_MIN);
             notificationChannel.setSound(null, null);
@@ -201,6 +206,5 @@ public class LiveVideoLocalService extends Service {
             e.printStackTrace();
         }
     }
-
 
 }

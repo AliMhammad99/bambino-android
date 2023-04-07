@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity {
             setupNavButton(findViewById(R.id.btn_dashboard), dashBoardFragment);
 
         }
-        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep2());
+        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment) {
@@ -115,7 +115,6 @@ public class MainActivity extends AppCompatActivity {
         // Create an intent to stop the service
         Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
         stopIntent.setAction("stop");
-
         // Start the service with the stop intent
         startService(stopIntent);
     }
