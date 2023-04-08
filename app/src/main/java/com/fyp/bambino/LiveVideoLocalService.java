@@ -48,7 +48,7 @@ public class LiveVideoLocalService extends Service {
     private String localURL = "http://192.168.43.239:80";
     private boolean shouldStop = false;
     private PowerManager.WakeLock wakeLock;
-
+private Context context = this;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -107,7 +107,7 @@ public class LiveVideoLocalService extends Service {
                             counter++;
                             if(counter == 6){
                                 // Launch your activity
-                                Intent activityIntent = new Intent(this, EmergencyCallActivity.class);
+                                Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
                                 activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(activityIntent);
 
