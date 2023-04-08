@@ -47,7 +47,7 @@ public class LiveVideoLocalService extends Service {
     public static boolean connectionLost = false;
     private String localURL = "http://192.168.43.239:80";
     private boolean shouldStop = false;
-    private PowerManager.WakeLock wakeLock;
+//    private PowerManager.WakeLock wakeLock;
 private Context context = this;
     @Override
     public void onCreate() {
@@ -84,9 +84,9 @@ private Context context = this;
         }
 
         // Acquire a WakeLock to keep the CPU running
-        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Bambino::WakeLock");
-        wakeLock.acquire();
+//        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Bambino::WakeLock");
+//        wakeLock.acquire();
     }
 
     @Override
@@ -105,14 +105,15 @@ private Context context = this;
                         if (!flashUpdating) {
 //                    Log.i("Service Running ", String.valueOf(counter));
                             counter++;
-                            if(counter == 6){
+                            Log.i("COUNTER:  ", String.valueOf(counter));
+                            if(counter == 5){
                                 // Launch your activity
                                 Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
                                 activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(activityIntent);
 
-                                // Release the WakeLock
-                                wakeLock.release();
+//                                // Release the WakeLock
+//                                wakeLock.release();
                             }
                             customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
                             foregroundNotification.setCustomContentView(customForegroundNotificationView);
@@ -210,13 +211,13 @@ private Context context = this;
         return START_REDELIVER_INTENT;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        if (wakeLock.isHeld()) {
-            wakeLock.release();
-        }
-    }
+//    @Override
+//    public void onDestroy() {
+//        super.onDestroy();
+//        if (wakeLock.isHeld()) {
+//            wakeLock.release();
+//        }
+//    }
 
     @Nullable
     @Override
