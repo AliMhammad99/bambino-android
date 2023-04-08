@@ -6,6 +6,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -13,6 +14,7 @@ import android.graphics.Matrix;
 import android.media.AudioAttributes;
 import android.os.Environment;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -45,6 +47,7 @@ public class LiveVideoLocalService extends Service {
     public static boolean connectionLost = false;
     private String localURL = "http://192.168.43.239:80";
     private boolean shouldStop = false;
+    private PowerManager.WakeLock wakeLock;
 
     @Override
     public void onCreate() {
@@ -55,11 +58,15 @@ public class LiveVideoLocalService extends Service {
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
         this.customForegroundNotificationView = new RemoteViews(getPackageName(), R.layout.layout_live_video_foreground_service);
-//this.customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop,stopIntent);
+        //this.customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop,stopIntent);
         Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
         stopIntent.setAction("stop");
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent, 0);
         customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop, stopPendingIntent);
+        int imageViewId = getResources().getIdentifier("dashboard_cell1", "id", getPackageName());
+        customForegroundNotificationView.setImageViewResource(imageViewId, R.drawable.ic_dashboard_nobaby);
+
+        customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.GONE);
         // Set the maximum height of the custom view to match the notification height
         this.customForegroundNotificationView.setViewPadding(R.id.notification_layout, 0, 0, 0, 0);
 
@@ -75,6 +82,11 @@ public class LiveVideoLocalService extends Service {
 
             startForeground(1001, this.foregroundNotification.build());
         }
+
+        // Acquire a WakeLock to keep the CPU running
+        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Bambino::WakeLock");
+        wakeLock.acquire();
     }
 
     @Override
@@ -93,6 +105,15 @@ public class LiveVideoLocalService extends Service {
                         if (!flashUpdating) {
 //                    Log.i("Service Running ", String.valueOf(counter));
                             counter++;
+                            if(counter == 6){
+                                // Launch your activity
+                                Intent activityIntent = new Intent(this, EmergencyCallActivity.class);
+                                activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                startActivity(activityIntent);
+
+                                // Release the WakeLock
+                                wakeLock.release();
+                            }
                             customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
                             foregroundNotification.setCustomContentView(customForegroundNotificationView);
                             startForeground(1001, foregroundNotification.build());
@@ -123,7 +144,7 @@ public class LiveVideoLocalService extends Service {
                                         int len;
                                         byte[] buffer;
 
-                                        while ((data = br.readLine()) != null && !flashUpdating &&!shouldStop) {
+                                        while ((data = br.readLine()) != null && !flashUpdating && !shouldStop) {
                                             if (data.contains("Content-Type:")) {
                                                 data = br.readLine();
 
@@ -187,6 +208,14 @@ public class LiveVideoLocalService extends Service {
 
 
         return START_REDELIVER_INTENT;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (wakeLock.isHeld()) {
+            wakeLock.release();
+        }
     }
 
     @Nullable
