@@ -2,9 +2,17 @@ package com.fyp.bambino;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.KeyguardManager;
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.MediaPlayer;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.util.Log;
+import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 
@@ -25,33 +33,52 @@ public class EmergencyCallActivity extends AppCompatActivity {
 
         try {
             AssetFileDescriptor afd = getAssets().openFd("emergency_alarm.mp3");
-            MediaPlayer player = new MediaPlayer();
-            player.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
-            player.prepare();
-            player.start();
-            player.setLooping(true);
+            this.mediaPlayer = new MediaPlayer();
+            mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
+            mediaPlayer.prepare();
+            mediaPlayer.start();
+            mediaPlayer.setLooping(true);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+//        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//        Log.i("HAS ","VIBRATOR");
+//        if (vibrator != null && vibrator.hasVibrator()) {
+//            vibrator.vibrate(10000);
+//        }
 
-
-//        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.emergency_alarm);
-//        mediaPlayer.setOnPreparedListener(this);
-//        mediaPlayer.setLooping(true);
-//        mediaPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//            @Override
-//            public void onPrepared(MediaPlayer mp) {
-//                mediaPlayer.start();
-//            }
-//        });
-//
-//        mediaPlayer.prepareAsync();
     }
 
     private void initUI() {
         this.acceptCallButton = this.findViewById(R.id.btn_accept_call);
         this.rejectCallButton = this.findViewById(R.id.btn_reject_call);
 
+        this.acceptCallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Unlock the screen
+                KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    keyguardManager.requestDismissKeyguard(EmergencyCallActivity.this, null);
+                }
+                new Handler().postDelayed(new Runnable() {
+                    public void run() {
+                        // Start the MainActivity with extra specifying which fragment to use
+                        Intent intent = new Intent(EmergencyCallActivity.this, MainActivity.class);
+                        intent.putExtra("FRAGMENT_TO_LOAD", "LIVE_VIDEO");
+                        startActivity(intent);
+                        finish();
+                    }
+                }, 0);
+            }
+        });
+
+        this.rejectCallButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                finish();
+            }
+        });
     }
 
     private void turnOnScreen() {
@@ -59,20 +86,6 @@ public class EmergencyCallActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
-//    @Override
-//    public void onPrepared(MediaPlayer mp) {
-//        mediaPlayer.start();
-//    }
-//    @Override
-//    protected void onStart() {
-//        super.onStart();
-////        try {
-////            mediaPlayer.prepare();
-////        } catch (IOException e) {
-////            throw new RuntimeException(e);
-////        }
-//        mediaPlayer.start();
-//    }
 
 //    @Override
 //    protected void onStop() {
@@ -80,4 +93,11 @@ public class EmergencyCallActivity extends AppCompatActivity {
 //        mediaPlayer.stop();
 //        mediaPlayer.release();
 //    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mediaPlayer.stop();
+        mediaPlayer.release();
+    }
 }

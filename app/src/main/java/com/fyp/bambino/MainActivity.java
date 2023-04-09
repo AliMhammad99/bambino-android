@@ -21,7 +21,11 @@ import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventList
 
 public class MainActivity extends AppCompatActivity {
 
+    private ImageButton dashboardButton;
+    private ImageButton liveVideoButton;
+    private ImageButton configButton;
     private ImageButton currentButton;
+
     private String mode = "";
 
     @Override
@@ -36,11 +40,21 @@ public class MainActivity extends AppCompatActivity {
         initUI();
         loadModeFromSharedPreferences();
         setupMode();
+        String fragmentName = getIntent().getStringExtra("FRAGMENT_TO_LOAD");
 
+
+        if (fragmentName!=null && fragmentName.equals("LIVE_VIDEO")) {
+            Log.i("FRAGMENT NAME:  ",fragmentName);
+            this.liveVideoButton.performClick();
+        }
 
     }
 
     private void initUI() {
+        this.dashboardButton = this.findViewById(R.id.btn_dashboard);
+        this.liveVideoButton = this.findViewById(R.id.btn_live_video);
+        this.configButton = this.findViewById(R.id.btn_config);
+
         LinearLayout navigation = findViewById(R.id.navigation);
 
         KeyboardVisibilityEvent.setEventListener(this, new KeyboardVisibilityEventListener() {
@@ -64,26 +78,26 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setupMode() {
-        currentButton = findViewById(R.id.btn_dashboard);
+        currentButton = this.dashboardButton;
         currentButton.setSelected(true);
 
         if (noConnectedDevice()) {
-            setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardNoCDFragment());
-            setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoNoCDFragment());
+            setupNavButton(this.dashboardButton, new DashBoardNoCDFragment());
+            setupNavButton(this.liveVideoButton, new LiveVideoNoCDFragment());
         } else {
             if (this.isLocalMode()) {
                 startLiveVideoLocalService();
-                setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
+                setupNavButton(this.liveVideoButton, new LiveVideoLocalFragment());
             } else {
                 startLiveVideoRemoteService();
-                setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
+                setupNavButton(this.liveVideoButton, new LiveVideoRemoteFragment());
             }
             DashBoardFragment dashBoardFragment = new DashBoardFragment();
             setCurrentFragment(dashBoardFragment);
-            setupNavButton(findViewById(R.id.btn_dashboard), dashBoardFragment);
+            setupNavButton(this.dashboardButton, dashBoardFragment);
 
         }
-        setupNavButton(findViewById(R.id.btn_config), new ConfigFragmentStep1());
+        setupNavButton(this.configButton, new ConfigFragmentStep1());
     }
 
     private void setupNavButton(ImageButton navButton, Fragment fragment) {

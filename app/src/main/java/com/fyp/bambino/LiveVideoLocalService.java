@@ -106,10 +106,10 @@ private Context context = this;
 //                    Log.i("Service Running ", String.valueOf(counter));
                             counter++;
                             Log.i("COUNTER:  ", String.valueOf(counter));
-                            if(counter == 4){
+                            if(counter == 3){
                                 // Launch your activity
                                 Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
-                                activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                                activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                                 startActivity(activityIntent);
 
 //                                // Release the WakeLock

@@ -37,7 +37,7 @@
             android:background="@drawable/shp_btn_back_enabled"
             android:focusable="true"
             android:foreground="@drawable/rpl_btn_back_white"
-            android:padding="0dp"
+            android:padding="10dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_live_video"
             android:tooltipText="Open Call" />
@@ -51,7 +51,7 @@
             android:background="@drawable/shp_btn_gray"
             android:focusable="true"
             android:foreground="@drawable/rpl_btn_back_white"
-            android:padding="23dp"
+            android:padding="25dp"
             android:scaleType="centerInside"
             android:src="@drawable/ic_btn_close"
             android:tooltipText="Reject Call" />
