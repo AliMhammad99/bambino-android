@@ -106,7 +106,7 @@ private Context context = this;
 //                    Log.i("Service Running ", String.valueOf(counter));
                             counter++;
                             Log.i("COUNTER:  ", String.valueOf(counter));
-                            if(counter == 5){
+                            if(counter == 4){
                                 // Launch your activity
                                 Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
                                 activityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
