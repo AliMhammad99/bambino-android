@@ -1,6 +1,5 @@
 package com.fyp.bambino;
 
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -11,16 +10,21 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.media.AudioAttributes;
 import android.os.Environment;
+import android.os.Handler;
 import android.os.IBinder;
-import android.os.PowerManager;
 import android.util.Log;
 import android.view.View;
-import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.Volley;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -34,8 +38,10 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
-public class LiveVideoLocalService extends Service {
+public class LiveVideoService extends Service {
 
 
     int counter;
@@ -46,6 +52,9 @@ public class LiveVideoLocalService extends Service {
     public static boolean flashUpdating = false;
     public static boolean connectionLost = true;
     private String localURL = "http://192.168.43.239:80";
+    private String remoteUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
+    private Timer remoteTimer;
+    private RequestQueue requestQueue;
     private boolean shouldStop = false;
     private Context context = this;
     final int NORMAL = 0;
@@ -65,8 +74,10 @@ public class LiveVideoLocalService extends Service {
         counter = 0;
         if ("stop".equals(intent.getAction())) {
             stop();
-        } else {
+        } else if ("local".equals(intent.getAction())) {
             startLocalLiveVideo();
+        } else if ("remote".equals(intent.getAction())) {
+            startRemoteLiveVideo();
         }
 
         return START_REDELIVER_INTENT;
@@ -90,7 +101,7 @@ public class LiveVideoLocalService extends Service {
         this.customForegroundNotificationView = new RemoteViews(getPackageName(), R.layout.layout_live_video_foreground_service);
 
         //Set stop button intent
-        Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
+        Intent stopIntent = new Intent(this, LiveVideoService.class);
         stopIntent.setAction("stop");
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent, 0);
         this.customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop, stopPendingIntent);
@@ -200,6 +211,10 @@ public class LiveVideoLocalService extends Service {
         shouldStop = true;
         stopForeground(true);
         stopSelf();
+        if (this.remoteTimer != null) {
+            this.remoteTimer.cancel();
+            this.remoteTimer = null;
+        }
     }
 
     private void startEmergencyCall() {
@@ -310,6 +325,54 @@ public class LiveVideoLocalService extends Service {
 
             }
         }).start();
+    }
+
+    private void startRemoteLiveVideo() {
+        this.requestQueue = Volley.newRequestQueue(this);
+        final Handler handler = new Handler();
+        this.remoteTimer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        // Call your PHP server here
+                        getImageFromServer();
+                        Log.i("REMOTE HTTP", " :)");
+                    }
+                });
+            }
+        };
+        // Schedule the timer to run every 1 second
+        this.remoteTimer.schedule(timerTask, 0, 1000);
+    }
+
+    private void getImageFromServer() {
+        ImageRequest imageRequest = new ImageRequest(remoteUrl,
+                new Response.Listener<Bitmap>() {
+                    @Override
+                    public void onResponse(Bitmap responseBitmap) {
+
+                        Matrix matrix = new Matrix();
+
+                        matrix.postRotate(90);
+
+                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                        currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+                        connectionEstablished();
+
+                    }
+                }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        connectionLost();
+                    }
+                });
+
+        requestQueue.add(imageRequest);
     }
 
     private void Bytes2ImageFile(byte[] bytes, String fileName) {

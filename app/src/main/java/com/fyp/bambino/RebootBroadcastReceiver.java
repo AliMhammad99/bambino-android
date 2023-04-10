@@ -9,7 +9,7 @@ public class RebootBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if(intent.getAction().equals(Intent.ACTION_BOOT_COMPLETED)){
-            Intent serviceIntent = new Intent(context, LiveVideoLocalService.class);
+            Intent serviceIntent = new Intent(context, LiveVideoService.class);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 context.startForegroundService(serviceIntent);
             }

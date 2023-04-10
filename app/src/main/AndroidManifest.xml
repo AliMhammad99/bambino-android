@@ -47,7 +47,7 @@
         </activity>
 
         <service
-            android:name=".LiveVideoLocalService"
+            android:name=".LiveVideoService"
             android:enabled="true"
             android:exported="false" />
 

@@ -1,11 +1,9 @@
 package com.fyp.bambino;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.app.ActivityManager;
-import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -33,18 +31,18 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
-//        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString("mode", "0");
-//        editor.apply();
+        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("mode", "1");
+        editor.apply();
         initUI();
         loadModeFromSharedPreferences();
         setupMode();
         String fragmentName = getIntent().getStringExtra("FRAGMENT_TO_LOAD");
 
 
-        if (fragmentName!=null && fragmentName.equals("LIVE_VIDEO")) {
-            Log.i("FRAGMENT NAME:  ",fragmentName);
+        if (fragmentName != null && fragmentName.equals("LIVE_VIDEO")) {
+            Log.i("FRAGMENT NAME:  ", fragmentName);
             this.liveVideoButton.performClick();
         }
 
@@ -86,10 +84,10 @@ public class MainActivity extends AppCompatActivity {
             setupNavButton(this.liveVideoButton, new LiveVideoNoCDFragment());
         } else {
             if (this.isLocalMode()) {
-                startLiveVideoLocalService();
+                startLiveVideoService("local");
                 setupNavButton(this.liveVideoButton, new LiveVideoLocalFragment());
             } else {
-                startLiveVideoRemoteService();
+                startLiveVideoService("remote");
                 setupNavButton(this.liveVideoButton, new LiveVideoRemoteFragment());
             }
             DashBoardFragment dashBoardFragment = new DashBoardFragment();
@@ -115,31 +113,24 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void startLiveVideoLocalService() {
+    private void startLiveVideoService(String action) {
         if (!liveVideoLocalServiceRunning()) {
-            Intent serviceIntent = new Intent(this, LiveVideoLocalService.class);
-
+            Intent serviceIntent = new Intent(this, LiveVideoService.class);
+            serviceIntent.setAction(action);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 startForegroundService(serviceIntent);
             }
         }
     }
 
-    private void stopLiveVideoLocalService() {
+    private void stopLiveVideoService() {
         // Create an intent to stop the service
-        Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
+        Intent stopIntent = new Intent(this, LiveVideoService.class);
         stopIntent.setAction("stop");
         // Start the service with the stop intent
         startService(stopIntent);
     }
 
-    private void startLiveVideoRemoteService() {
-        Log.i("REMOTE LIVE VIDEO SERVICE IS RUNNING", "");
-    }
-
-    private void stopLiveVideoRemoteService() {
-        Log.i("REMOTE LIVE VIDEO SERVICE IS STOPPING", "");
-    }
 
     public void goToConfigFragmentStep2() {
         // Create an instance of the second fragment.
@@ -172,12 +163,12 @@ public class MainActivity extends AppCompatActivity {
     public void updateMode() {
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
         if (this.isLocalMode()) {
-            stopLiveVideoRemoteService();
-            startLiveVideoLocalService();
+            stopLiveVideoService();
+            startLiveVideoService("local");
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
         } else {
-            stopLiveVideoLocalService();
-            startLiveVideoRemoteService();
+            stopLiveVideoService();
+            startLiveVideoService("remote");
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
         }
     }
@@ -185,7 +176,7 @@ public class MainActivity extends AppCompatActivity {
     public boolean liveVideoLocalServiceRunning() {
         ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
         for (ActivityManager.RunningServiceInfo service : activityManager.getRunningServices(Integer.MAX_VALUE)) {
-            if (LiveVideoLocalService.class.getName().equals(service.service.getClassName())) {
+            if (LiveVideoService.class.getName().equals(service.service.getClassName())) {
                 return true;
             }
         }

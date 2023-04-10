@@ -108,14 +108,22 @@ public class LiveVideoRemoteFragment extends Fragment {
                 handler.post(new Runnable() {
                     @Override
                     public void run() {
-                        // Call your PHP server here
-                        getImageFromServer();
+                        if (LiveVideoService.connectionLost) {
+
+                            showProgressBar();
+                            hideFlashButton();
+                            return;
+                        }
+                        // Render image
+                        imageView.setImageBitmap(LiveVideoService.currentFrameBitmap);
+                        hideProgressBar();
+                        showFlashButton();
                     }
                 });
             }
         };
         // Schedule the timer to run every 1 second
-        timer.schedule(timerTask, 0, 1000);
+        timer.schedule(timerTask, 0, 500);
 
         this.flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -145,33 +153,6 @@ public class LiveVideoRemoteFragment extends Fragment {
 
     }
 
-    private void getImageFromServer() {
-        ImageRequest imageRequest = new ImageRequest(imageUrl,
-                new Response.Listener<Bitmap>() {
-                    @Override
-                    public void onResponse(Bitmap responseBitmap) {
-
-                        Matrix matrix = new Matrix();
-
-                        matrix.postRotate(90);
-
-                        Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-
-                        Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-                        hideProgressBar();
-
-                        imageView.setImageBitmap(rotatedBitmap);
-                    }
-                }, 0, 0, ImageView.ScaleType.CENTER_CROP, null,
-                new Response.ErrorListener() {
-                    @Override
-                    public void onErrorResponse(VolleyError error) {
-                        showProgressBar();
-                    }
-                });
-
-        requestQueue.add(imageRequest);
-    }
 //    @Override
 //    public void onPause() {
 //        super.onPause();
@@ -179,10 +160,19 @@ public class LiveVideoRemoteFragment extends Fragment {
 //        handler.removeCallbacks(runnable);
 //    }
 
-    private void showProgressBar(){
+    private void showProgressBar() {
         this.progressBar.setVisibility(View.VISIBLE);
     }
-    private void hideProgressBar(){
+
+    private void hideProgressBar() {
         this.progressBar.setVisibility(View.GONE);
+    }
+
+    private void hideFlashButton() {
+        this.flashButton.setVisibility(View.GONE);
+    }
+
+    private void showFlashButton() {
+        this.flashButton.setVisibility(View.VISIBLE);
     }
 }
