@@ -202,6 +202,13 @@ public class LiveVideoLocalService extends Service {
         stopSelf();
     }
 
+    private void startEmergencyCall() {
+        // Launch your activity
+        Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
+        activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(activityIntent);
+    }
+
     private void startLocalLiveVideo() {
         new Thread(new Runnable() {
             @Override
@@ -209,17 +216,11 @@ public class LiveVideoLocalService extends Service {
 
                 while (!shouldStop) {
                     if (!flashUpdating) {
-//                    Log.i("Service Running ", String.valueOf(counter));
                         counter++;
                         Log.i("COUNTER:  ", String.valueOf(counter));
                         if (counter == 3) {
-                            // Launch your activity
-                            Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
-                            activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                            startActivity(activityIntent);
+                            startEmergencyCall();
 
-//                                // Release the WakeLock
-//                                wakeLock.release();
                         }
 //                            updateForegroundNotification(1, 2, 0, 1);
                         BufferedInputStream bis = null;
