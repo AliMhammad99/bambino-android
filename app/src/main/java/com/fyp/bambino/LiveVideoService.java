@@ -61,11 +61,12 @@ public class LiveVideoService extends Service {
     final int DANGER = 1;
     final int NO_DATA = 2;
 
+    private String mode = "";
 
     @Override
     public void onCreate() {
         super.onCreate();
-        setUpForegroundNotification();
+
 
     }
 
@@ -75,11 +76,15 @@ public class LiveVideoService extends Service {
         if ("stop".equals(intent.getAction())) {
             stop();
         } else if ("local".equals(intent.getAction())) {
+//            stop();
+            mode = "Local";
             startLocalLiveVideo();
         } else if ("remote".equals(intent.getAction())) {
+//            stop();
+            mode = "Remote";
             startRemoteLiveVideo();
         }
-
+        setUpForegroundNotification();
         return START_REDELIVER_INTENT;
     }
 
@@ -99,6 +104,9 @@ public class LiveVideoService extends Service {
 
         //Create custom view for the notification
         this.customForegroundNotificationView = new RemoteViews(getPackageName(), R.layout.layout_live_video_foreground_service);
+
+        //Set its title based on mode
+        this.customForegroundNotificationView.setTextViewText(R.id.notification_title, "Bambino is monitoring your baby (" + mode + ")");
 
         //Set stop button intent
         Intent stopIntent = new Intent(this, LiveVideoService.class);
@@ -209,6 +217,7 @@ public class LiveVideoService extends Service {
     private void stop() {
         // Stop the service
         shouldStop = true;
+        connectionLost = true;
         stopForeground(true);
         stopSelf();
         if (this.remoteTimer != null) {

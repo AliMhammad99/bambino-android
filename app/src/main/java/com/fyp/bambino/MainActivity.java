@@ -31,10 +31,10 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
-        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString("mode", "1");
-        editor.apply();
+//        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putString("mode", "1");
+//        editor.apply();
         initUI();
         loadModeFromSharedPreferences();
         setupMode();
@@ -163,11 +163,11 @@ public class MainActivity extends AppCompatActivity {
     public void updateMode() {
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
         if (this.isLocalMode()) {
-            stopLiveVideoService();
+//            stopLiveVideoService();
             startLiveVideoService("local");
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
         } else {
-            stopLiveVideoService();
+//            stopLiveVideoService();
             startLiveVideoService("remote");
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
         }

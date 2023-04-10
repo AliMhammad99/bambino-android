@@ -18,10 +18,12 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
+import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 
 import java.util.Timer;
@@ -33,18 +35,12 @@ import java.util.TimerTask;
  * create an instance of this fragment.
  */
 public class LiveVideoRemoteFragment extends Fragment {
-//    private Handler handler;
-//    private Runnable runnable;
-
-
     private ImageView imageView;
     private RequestQueue requestQueue;
     private String imageUrl = "https://bambinoserver0.000webhostapp.com/image.jpg";
     private String getFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/get_flash_led.php";
     private String setFlashLEDUrl = "https://bambinoserver0.000webhostapp.com/set_flash_led.php?flashLED=";
-
     private ProgressBar progressBar;
-
     private ImageButton flashButton;
     private boolean flashOn = false;
 
@@ -118,6 +114,7 @@ public class LiveVideoRemoteFragment extends Fragment {
                         imageView.setImageBitmap(LiveVideoService.currentFrameBitmap);
                         hideProgressBar();
                         showFlashButton();
+
                     }
                 });
             }
@@ -128,37 +125,46 @@ public class LiveVideoRemoteFragment extends Fragment {
         this.flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                flashOn = !flashOn;
+                setFlashLEDOnServer(flashOn);
                 if (flashOn) {
-                    flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_off));
-                } else {
+
                     flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_on));
+                } else {
+                    flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_off));
                 }
             }
         });
-
-        // Create the handler and runnable for the repeating task
-//        handler = new Handler();
-//        runnable = new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.d("MyFragment", "Hello, world!");
-//                handler.postDelayed(this, 1000);
-//            }
-//        };
-//
-//        // Start the repeating task
-//        handler.postDelayed(runnable, 1000);
-        // Inflate the layout for this fragment
         return rootView;
-
     }
 
-//    @Override
-//    public void onPause() {
-//        super.onPause();
-//        // Stop the repeating task when the fragment is no longer visible
-//        handler.removeCallbacks(runnable);
-//    }
+
+    private void setFlashLEDOnServer(boolean flashLED) {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, setFlashLEDUrl + flashLED, null, null);
+        requestQueue.add(stringRequest);
+    }
+
+    private void getFlashLEDFromServer() {
+        StringRequest stringRequest = new StringRequest(Request.Method.GET, getFlashLEDUrl,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        boolean flashOn = Boolean.parseBoolean(response);
+                        if (flashOn) {
+                            flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_on));
+                        } else {
+                            flashButton.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_flash_off));
+                        }
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // Handle the error
+            }
+        });
+        requestQueue.add(stringRequest);
+
+    }
 
     private void showProgressBar() {
         this.progressBar.setVisibility(View.VISIBLE);
