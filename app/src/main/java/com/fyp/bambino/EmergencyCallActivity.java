@@ -22,6 +22,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ImageButton acceptCallButton;
     private ImageButton rejectCallButton;
+    private Vibrator vibrator;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,11 +42,11 @@ public class EmergencyCallActivity extends AppCompatActivity {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-//        Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//        Log.i("HAS ","VIBRATOR");
-//        if (vibrator != null && vibrator.hasVibrator()) {
-//            vibrator.vibrate(10000);
-//        }
+        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+        if (vibrator.hasVibrator()) {
+            long[] pattern = {0, 1000}; // Vibrate for 1 second, then pause for 1 second
+            vibrator.vibrate(pattern, 0); // Start the vibration pattern
+        }
 
     }
 
@@ -87,17 +88,13 @@ public class EmergencyCallActivity extends AppCompatActivity {
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
     }
 
-//    @Override
-//    protected void onStop() {
-//        super.onStop();
-//        mediaPlayer.stop();
-//        mediaPlayer.release();
-//    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
+        if (vibrator != null) {
+            vibrator.cancel(); // Stop the vibration pattern
+        }
     }
 }

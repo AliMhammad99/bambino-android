@@ -44,30 +44,58 @@ public class LiveVideoLocalService extends Service {
 
     public static Bitmap currentFrameBitmap;
     public static boolean flashUpdating = false;
-    public static boolean connectionLost = false;
+    public static boolean connectionLost = true;
     private String localURL = "http://192.168.43.239:80";
     private boolean shouldStop = false;
-//    private PowerManager.WakeLock wakeLock;
-private Context context = this;
+    private Context context = this;
+    final int NORMAL = 0;
+    final int DANGER = 1;
+    final int NO_DATA = 2;
+
+
     @Override
     public void onCreate() {
         super.onCreate();
+        setUpForegroundNotification();
+
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        counter = 0;
+        if ("stop".equals(intent.getAction())) {
+            stop();
+        } else {
+            startLocalLiveVideo();
+        }
+
+        return START_REDELIVER_INTENT;
+    }
+
+    @Nullable
+    @Override
+    public IBinder onBind(Intent intent) {
+        return null;
+    }
+
+    private void setUpForegroundNotification() {
         final String CHANNEL_ID = "Bambino Local Live Video";
         NotificationChannel notificationChannel = null;
-        // Create a PendingIntent for when the notification is clicked
+
+        // Create a PendingIntent for when the notification is clicked to open dashboard
         Intent notificationIntent = new Intent(this, MainActivity.class);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+        //Create custom view for the notification
         this.customForegroundNotificationView = new RemoteViews(getPackageName(), R.layout.layout_live_video_foreground_service);
-        //this.customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop,stopIntent);
+
+        //Set stop button intent
         Intent stopIntent = new Intent(this, LiveVideoLocalService.class);
         stopIntent.setAction("stop");
         PendingIntent stopPendingIntent = PendingIntent.getService(this, 0, stopIntent, 0);
-        customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop, stopPendingIntent);
-        int imageViewId = getResources().getIdentifier("dashboard_cell1", "id", getPackageName());
-        customForegroundNotificationView.setImageViewResource(imageViewId, R.drawable.ic_dashboard_nobaby);
+        this.customForegroundNotificationView.setOnClickPendingIntent(R.id.btn_stop, stopPendingIntent);
 
-        customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.GONE);
-        // Set the maximum height of the custom view to match the notification height
+        // Set the padding of the custom view to match the notification height
         this.customForegroundNotificationView.setViewPadding(R.id.notification_layout, 0, 0, 0, 0);
 
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
@@ -82,147 +110,205 @@ private Context context = this;
 
             startForeground(1001, this.foregroundNotification.build());
         }
-
-        // Acquire a WakeLock to keep the CPU running
-//        PowerManager powerManager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-//        wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Bambino::WakeLock");
-//        wakeLock.acquire();
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        counter = 0;
+    private void updateForegroundNotification(int cell1, int cell2, int cell3, int cell4) {
+
+        switch (cell1) {
+            case NORMAL:
+                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_incrib);
+                break;
+            case DANGER:
+                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_nobaby);
+                break;
+            case NO_DATA:
+                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_nodata);
+                break;
+        }
+        switch (cell2) {
+            case NORMAL:
+                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_onback);
+                break;
+            case DANGER:
+                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_onface);
+                break;
+            case NO_DATA:
+                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_nodata);
+                break;
+        }
+        switch (cell3) {
+            case NORMAL:
+                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_covered);
+                break;
+            case DANGER:
+                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_uncovered);
+                break;
+            case NO_DATA:
+                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_nodata);
+                break;
+        }
+        switch (cell4) {
+            case NORMAL:
+                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_sleeping);
+                break;
+            case DANGER:
+                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_awake);
+                break;
+            case NO_DATA:
+                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_nodata);
+                break;
+        }
+        //Hide progress bar
+//        this.customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.GONE);
+        this.customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
+
+        this.foregroundNotification.setCustomContentView(customForegroundNotificationView);
+        this.startForeground(1001, foregroundNotification.build());
+    }
+
+    private void setImageViewInsideForegroundNotification(String imageViewId, int drawableSrcId) {
+        //Change an imageview src
+        int imageViewIdInt = getResources().getIdentifier(imageViewId, "id", getPackageName());
+        this.customForegroundNotificationView.setImageViewResource(imageViewIdInt, drawableSrcId);
+    }
+
+    private void hideProgressBar() {
+        //Hide progress bar
+        this.customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.GONE);
+        this.startForeground(1001, foregroundNotification.build());
+    }
+
+    private void showProgressBar() {
+        //Show progress bar
+        this.customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.VISIBLE);
+        this.startForeground(1001, foregroundNotification.build());
+    }
+
+    private void connectionEstablished() {
+        connectionLost = false;
+        hideProgressBar();
+    }
+
+    private void connectionLost() {
+        connectionLost = true;
+        showProgressBar();
+        updateForegroundNotification(NO_DATA, NO_DATA, NO_DATA, NO_DATA);
+    }
+
+    private void stop() {
+        // Stop the service
+        shouldStop = true;
+        stopForeground(true);
+        stopSelf();
+    }
+
+    private void startLocalLiveVideo() {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                if ("stop".equals(intent.getAction())) {
-                    // Stop the service
-                    shouldStop = true;
-                    stopForeground(true);
-                    stopSelf();
-                } else {
-                    while (!shouldStop) {
-                        if (!flashUpdating) {
+
+                while (!shouldStop) {
+                    if (!flashUpdating) {
 //                    Log.i("Service Running ", String.valueOf(counter));
-                            counter++;
-                            Log.i("COUNTER:  ", String.valueOf(counter));
-                            if(counter == 3){
-                                // Launch your activity
-                                Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
-                                activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-                                startActivity(activityIntent);
+                        counter++;
+                        Log.i("COUNTER:  ", String.valueOf(counter));
+                        if (counter == 3) {
+                            // Launch your activity
+                            Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
+                            activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                            startActivity(activityIntent);
 
 //                                // Release the WakeLock
 //                                wakeLock.release();
-                            }
-                            customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
-                            foregroundNotification.setCustomContentView(customForegroundNotificationView);
-                            startForeground(1001, foregroundNotification.build());
-                            BufferedInputStream bis = null;
-                            FileOutputStream fos = null;
+                        }
+//                            updateForegroundNotification(1, 2, 0, 1);
+                        BufferedInputStream bis = null;
+                        FileOutputStream fos = null;
+                        try {
+
+                            URL url = new URL(localURL);
+
                             try {
+                                HttpURLConnection huc = (HttpURLConnection) url.openConnection();
+                                huc.setRequestMethod("GET");
+                                huc.setConnectTimeout(1000 * 5);
+                                huc.setReadTimeout(1000 * 5);
+                                huc.setDoInput(true);
 
-                                URL url = new URL(localURL);
+                                huc.connect();
 
-                                try {
-                                    HttpURLConnection huc = (HttpURLConnection) url.openConnection();
-                                    huc.setRequestMethod("GET");
-                                    huc.setConnectTimeout(1000 * 5);
-                                    huc.setReadTimeout(1000 * 5);
-                                    huc.setDoInput(true);
+                                if (huc.getResponseCode() == 200) {
+                                    connectionEstablished();
+                                    updateForegroundNotification(1, 2, 0, 1);
+                                    InputStream in = huc.getInputStream();
 
-                                    huc.connect();
+                                    InputStreamReader isr = new InputStreamReader(in);
+                                    BufferedReader br = new BufferedReader(isr);
 
-                                    if (huc.getResponseCode() == 200) {
-                                        connectionLost = false;
-                                        InputStream in = huc.getInputStream();
+                                    String data;
 
-                                        InputStreamReader isr = new InputStreamReader(in);
-                                        BufferedReader br = new BufferedReader(isr);
+                                    int len;
+                                    byte[] buffer;
 
-                                        String data;
+                                    while ((data = br.readLine()) != null && !flashUpdating && !shouldStop) {
+                                        if (data.contains("Content-Type:")) {
+                                            data = br.readLine();
 
-                                        int len;
-                                        byte[] buffer;
+                                            len = Integer.parseInt(data.split(":")[1].trim());
 
-                                        while ((data = br.readLine()) != null && !flashUpdating && !shouldStop) {
-                                            if (data.contains("Content-Type:")) {
-                                                data = br.readLine();
+                                            bis = new BufferedInputStream(in);
+                                            buffer = new byte[len];
 
-                                                len = Integer.parseInt(data.split(":")[1].trim());
-
-                                                bis = new BufferedInputStream(in);
-                                                buffer = new byte[len];
-
-                                                int t = 0;
-                                                while (t < len) {
-                                                    t += bis.read(buffer, t, len - t);
-                                                }
-
-                                                Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-
-                                                final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
-                                                Matrix matrix = new Matrix();
-
-                                                matrix.postRotate(90);
-                                                Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
-
-                                                currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-
-
+                                            int t = 0;
+                                            while (t < len) {
+                                                t += bis.read(buffer, t, len - t);
                                             }
+
+                                            Bytes2ImageFile(buffer, getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+
+                                            final Bitmap responseBitmap = BitmapFactory.decodeFile(getExternalFilesDir(Environment.DIRECTORY_PICTURES) + "/0A.jpg");
+                                            Matrix matrix = new Matrix();
+
+                                            matrix.postRotate(90);
+                                            Bitmap scaledBitmap = Bitmap.createScaledBitmap(responseBitmap, responseBitmap.getWidth(), responseBitmap.getHeight(), true);
+
+                                            currentFrameBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
 
 
                                         }
-                                    }
 
-                                } catch (IOException e) {
-                                    if (e instanceof SocketTimeoutException || e instanceof ConnectException) {
-                                        // Handle SocketTimeoutException
-                                        Log.i("YESSSSSSSSSSSS", "");
-                                        connectionLost = true;
 
                                     }
-                                    Thread.sleep(5000);
-                                    e.printStackTrace();
                                 }
-                            } catch (MalformedURLException | InterruptedException e) {
+
+                            } catch (IOException e) {
+                                if (e instanceof SocketTimeoutException || e instanceof ConnectException) {
+                                    // Handle SocketTimeoutException
+                                    connectionLost();
+                                }
+                                Thread.sleep(5000);
                                 e.printStackTrace();
-                            } finally {
-                                try {
-                                    if (bis != null) {
-                                        bis.close();
-                                    }
-                                    if (fos != null) {
-                                        fos.close();
-                                    }
-
-                                } catch (IOException e) {
-                                    e.printStackTrace();
+                            }
+                        } catch (MalformedURLException | InterruptedException e) {
+                            e.printStackTrace();
+                        } finally {
+                            try {
+                                if (bis != null) {
+                                    bis.close();
                                 }
+                                if (fos != null) {
+                                    fos.close();
+                                }
+
+                            } catch (IOException e) {
+                                e.printStackTrace();
                             }
                         }
                     }
                 }
+
             }
         }).start();
-
-
-        return START_REDELIVER_INTENT;
-    }
-
-//    @Override
-//    public void onDestroy() {
-//        super.onDestroy();
-//        if (wakeLock.isHeld()) {
-//            wakeLock.release();
-//        }
-//    }
-
-    @Nullable
-    @Override
-    public IBinder onBind(Intent intent) {
-        return null;
     }
 
     private void Bytes2ImageFile(byte[] bytes, String fileName) {
