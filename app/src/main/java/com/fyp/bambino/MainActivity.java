@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -163,12 +164,26 @@ public class MainActivity extends AppCompatActivity {
     public void updateMode() {
         setupNavButton(findViewById(R.id.btn_dashboard), new DashBoardFragment());
         if (this.isLocalMode()) {
-//            stopLiveVideoService();
-            startLiveVideoService("local");
+            stopLiveVideoService();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Code to be executed after delay
+                    startLiveVideoService("local");
+                }
+            }, 3000);
+
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoLocalFragment());
         } else {
-//            stopLiveVideoService();
-            startLiveVideoService("remote");
+            stopLiveVideoService();
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Code to be executed after delay
+                    startLiveVideoService("remote");
+                }
+            }, 3000);
+
             setupNavButton(findViewById(R.id.btn_live_video), new LiveVideoRemoteFragment());
         }
     }

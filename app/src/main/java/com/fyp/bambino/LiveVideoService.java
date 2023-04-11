@@ -74,12 +74,15 @@ public class LiveVideoService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         counter = 0;
         if ("stop".equals(intent.getAction())) {
+            Log.i("STOPPPPPPPPPP","STOPPPPPPPPPP");
             stop();
         } else if ("local".equals(intent.getAction())) {
 //            stop();
+            Log.i("LOCALLLLLLLLLLLLL","LOCALLLLLLLLLLLLL");
             mode = "Local";
             startLocalLiveVideo();
         } else if ("remote".equals(intent.getAction())) {
+            Log.i("REMOTEEEEEEEEEEEE","REMOTEEEEEEEEEEEE");
 //            stop();
             mode = "Remote";
             startRemoteLiveVideo();
@@ -237,15 +240,18 @@ public class LiveVideoService extends Service {
         new Thread(new Runnable() {
             @Override
             public void run() {
-
+                if (remoteTimer != null) {
+                    remoteTimer.cancel();
+                    remoteTimer = null;
+                }
                 while (!shouldStop) {
                     if (!flashUpdating) {
                         counter++;
                         Log.i("COUNTER:  ", String.valueOf(counter));
-                        if (counter == 3) {
-                            startEmergencyCall();
-
-                        }
+//                        if (counter == 3) {
+//                            startEmergencyCall();
+//
+//                        }
 //                            updateForegroundNotification(1, 2, 0, 1);
                         BufferedInputStream bis = null;
                         FileOutputStream fos = null;
