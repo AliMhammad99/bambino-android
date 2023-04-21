@@ -7,6 +7,9 @@ import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -15,8 +18,15 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
+
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
+
+import java.io.ByteArrayOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -47,8 +57,60 @@ public class MainActivity extends AppCompatActivity {
             this.liveVideoButton.performClick();
         }
 
-    }
+        // Instantiate the RequestQueue.
+        RequestQueue queue = Volley.newRequestQueue(this);
+        String url = "http://3666-34-86-115-151.ngrok-free.app/upload";
 
+        // Load the Bitmap from a drawable resource
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+
+    }
+    // Static nested class to avoid memory leaks
+    private static class ImageUploadTask extends AsyncTask<Bitmap, Void, byte[]> {
+
+        private final String url;
+        private final RequestQueue queue;
+
+        public ImageUploadTask(String url, RequestQueue queue) {
+            this.url = url;
+            this.queue = queue;
+        }
+
+        @Override
+        protected byte[] doInBackground(Bitmap... bitmaps) {
+            // Get the Bitmap from the input parameter
+            Bitmap bitmap = bitmaps[0];
+
+            // Convert the Bitmap to a JPEG byte array
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+            byte[] imageBytes = baos.toByteArray();
+
+            return imageBytes;
+        }
+
+        @Override
+        protected void onPostExecute(byte[] imageBytes) {
+            // Create a new multipart request
+            MultiPartRequest multipartRequest = new MultiPartRequest(url, new Response.Listener<String>() {
+                @Override
+                public void onResponse(String response) {
+                    // Handle the server response here
+                }
+            }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // Handle the error here
+                }
+            });
+
+            // Add the image data to the request body
+            multipartRequest.addPart(new FormPart("image", imageBytes, "image/jpeg", "image.jpg"));
+
+            // Add the request to the queue
+            queue.add(multipartRequest);
+        }
+    }
     private void initUI() {
         this.dashboardButton = this.findViewById(R.id.btn_dashboard);
         this.liveVideoButton = this.findViewById(R.id.btn_live_video);
