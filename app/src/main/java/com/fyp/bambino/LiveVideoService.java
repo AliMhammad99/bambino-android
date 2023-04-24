@@ -71,7 +71,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://e5a8-35-204-88-29.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://cb49-35-204-115-56.ngrok-free.app/upload";
 
     @Override
     public void onCreate() {
@@ -432,6 +432,7 @@ public class LiveVideoService extends Service {
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     currentFrameBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
+
                     String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                     URL url = null;
@@ -461,6 +462,9 @@ public class LiveVideoService extends Service {
                             }
                             Log.i("RESPONSE:    ", response);
                             in.close();
+
+                        } else {
+                            updateForegroundNotification(0, 0, 0, 0);
                         }
                     } catch (MalformedURLException e) {
                         throw new RuntimeException(e);
