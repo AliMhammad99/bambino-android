@@ -27,6 +27,7 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -71,7 +72,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://cb49-35-204-115-56.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://3273-35-229-103-79.ngrok-free.app/upload";
 
     @Override
     public void onCreate() {
@@ -420,15 +421,16 @@ public class LiveVideoService extends Service {
 
     private void connectToFlaskServer() {
         flaskAPITimer = new Timer();
+        currentFrameBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 // your code here
-                if (currentFrameBitmap != null) {
+                if (currentFrameBitmap != null && !connectionLost) {
                     Log.i("FlaskThread:    ", "RUNNING");
                     // Perform network operations here
                     // Load the Bitmap from a drawable resource
-//                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     currentFrameBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
                     byte[] byteArray = stream.toByteArray();
@@ -462,24 +464,31 @@ public class LiveVideoService extends Service {
                             }
                             Log.i("RESPONSE:    ", response);
                             in.close();
+                            JSONArray jsonArray = new JSONArray(response); //replace responseString with the actual response from the API
+                            int[] result = new int[jsonArray.length()];
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                result[i] = jsonArray.getInt(i);
+                            }
+                            updateForegroundNotification(result[0],result[1],result[2],result[3]);
+
 
                         } else {
-                            updateForegroundNotification(0, 0, 0, 0);
+                            updateForegroundNotification(NO_DATA, NO_DATA, NO_DATA, NO_DATA);
                         }
                     } catch (MalformedURLException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     } catch (ProtocolException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     } catch (IOException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     } catch (JSONException e) {
-                        throw new RuntimeException(e);
+                        e.printStackTrace();
                     }
                 }
             }
         };
         // Schedule the timer to run every 2 seconds
-        flaskAPITimer.schedule(timerTask, 0, 2000);
+        flaskAPITimer.schedule(timerTask, 0, 1000);
     }
 
 }
