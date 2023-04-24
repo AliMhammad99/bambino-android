@@ -13,6 +13,7 @@ import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
@@ -26,7 +27,19 @@ import com.android.volley.toolbox.Volley;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEvent;
 import net.yslibrary.android.keyboardvisibilityevent.KeyboardVisibilityEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
+import java.nio.ByteBuffer;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -59,58 +72,64 @@ public class MainActivity extends AppCompatActivity {
 
         // Instantiate the RequestQueue.
         RequestQueue queue = Volley.newRequestQueue(this);
-        String url = "http://3666-34-86-115-151.ngrok-free.app/upload";
+//        String url = "http://3666-34-86-115-151.ngrok-free.app/upload";
 
-        // Load the Bitmap from a drawable resource
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
-
+        FlaskThread flaskThread = new FlaskThread();
+        flaskThread.start();
     }
-    // Static nested class to avoid memory leaks
-    private static class ImageUploadTask extends AsyncTask<Bitmap, Void, byte[]> {
 
-        private final String url;
-        private final RequestQueue queue;
-
-        public ImageUploadTask(String url, RequestQueue queue) {
-            this.url = url;
-            this.queue = queue;
-        }
-
+    private class FlaskThread extends Thread {
         @Override
-        protected byte[] doInBackground(Bitmap... bitmaps) {
-            // Get the Bitmap from the input parameter
-            Bitmap bitmap = bitmaps[0];
+        public void run() {
+            Log.i("FlaskThread:    ", "RUNNING");
+            // Perform network operations here
+            // Load the Bitmap from a drawable resource
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
-            // Convert the Bitmap to a JPEG byte array
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-            byte[] imageBytes = baos.toByteArray();
+            URL url = null;
+            try {
+                url = new URL("https://e5a8-35-204-88-29.ngrok-free.app/upload");
+                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                connection.setRequestMethod("POST");
+                connection.setRequestProperty("Content-Type", "application/json");
+                connection.setRequestProperty("Accept", "application/json");
 
-            return imageBytes;
-        }
+                JSONObject jsonRequest = new JSONObject();
+                jsonRequest.put("image", encodedImage);
 
-        @Override
-        protected void onPostExecute(byte[] imageBytes) {
-            // Create a new multipart request
-            MultiPartRequest multipartRequest = new MultiPartRequest(url, new Response.Listener<String>() {
-                @Override
-                public void onResponse(String response) {
-                    // Handle the server response here
+                OutputStream outputStream = connection.getOutputStream();
+                outputStream.write(jsonRequest.toString().getBytes());
+                outputStream.flush();
+                outputStream.close();
+
+                int statusCode = connection.getResponseCode();
+                Log.i("RESPONSE CODE:   ", String.valueOf(statusCode));
+                if (statusCode == HttpURLConnection.HTTP_OK) {
+                    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                    String line;
+                    String response = "";
+                    while ((line = in.readLine()) != null) {
+                        response += line;
+                    }
+                    Log.i("RESPONSE:    ", response);
+                    in.close();
                 }
-            }, new Response.ErrorListener() {
-                @Override
-                public void onErrorResponse(VolleyError error) {
-                    // Handle the error here
-                }
-            });
-
-            // Add the image data to the request body
-            multipartRequest.addPart(new FormPart("image", imageBytes, "image/jpeg", "image.jpg"));
-
-            // Add the request to the queue
-            queue.add(multipartRequest);
+            } catch (MalformedURLException e) {
+                throw new RuntimeException(e);
+            } catch (ProtocolException e) {
+                throw new RuntimeException(e);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            } catch (JSONException e) {
+                throw new RuntimeException(e);
+            }
         }
     }
+
     private void initUI() {
         this.dashboardButton = this.findViewById(R.id.btn_dashboard);
         this.liveVideoButton = this.findViewById(R.id.btn_live_video);

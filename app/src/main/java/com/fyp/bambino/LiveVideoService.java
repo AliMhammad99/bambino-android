@@ -48,7 +48,7 @@ public class LiveVideoService extends Service {
     RemoteViews customForegroundNotificationView;
     Notification.Builder foregroundNotification;
 
-    public static Bitmap currentFrameBitmap;
+    public static Bitmap currentFrameBitmap = null;
     public static boolean flashUpdating = false;
     public static boolean connectionLost = true;
     private String localURL = "http://192.168.43.239:80";
@@ -62,6 +62,8 @@ public class LiveVideoService extends Service {
     final int NO_DATA = 2;
 
     private String mode = "";
+
+    private Timer flaskAPITimer;
 
     @Override
     public void onCreate() {
@@ -226,6 +228,10 @@ public class LiveVideoService extends Service {
         if (this.remoteTimer != null) {
             this.remoteTimer.cancel();
             this.remoteTimer = null;
+        }
+        if(this.flaskAPITimer!=null){
+            this.flaskAPITimer.cancel();
+            this.flaskAPITimer = null;
         }
     }
 
@@ -400,6 +406,19 @@ public class LiveVideoService extends Service {
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void connectToFlaskServer(){
+        flaskAPITimer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // your code here
+
+            }
+        };
+        // Schedule the timer to run every 2 seconds
+        flaskAPITimer.schedule(timerTask, 0, 2000);
     }
 
 }
