@@ -13,6 +13,7 @@ import android.graphics.Matrix;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -26,16 +27,22 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.ImageRequest;
 import com.android.volley.toolbox.Volley;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.ProtocolException;
 import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.util.Timer;
@@ -64,6 +71,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
+    private String flaskAPIURL = "https://e5a8-35-204-88-29.ngrok-free.app/upload";
 
     @Override
     public void onCreate() {
@@ -76,18 +84,20 @@ public class LiveVideoService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         counter = 0;
         if ("stop".equals(intent.getAction())) {
-            Log.i("STOPPPPPPPPPP","STOPPPPPPPPPP");
+            Log.i("STOPPPPPPPPPP", "STOPPPPPPPPPP");
             stop();
         } else if ("local".equals(intent.getAction())) {
 //            stop();
-            Log.i("LOCALLLLLLLLLLLLL","LOCALLLLLLLLLLLLL");
+            Log.i("LOCALLLLLLLLLLLLL", "LOCALLLLLLLLLLLLL");
             mode = "Local";
             startLocalLiveVideo();
+            connectToFlaskServer();
         } else if ("remote".equals(intent.getAction())) {
-            Log.i("REMOTEEEEEEEEEEEE","REMOTEEEEEEEEEEEE");
+            Log.i("REMOTEEEEEEEEEEEE", "REMOTEEEEEEEEEEEE");
 //            stop();
             mode = "Remote";
             startRemoteLiveVideo();
+            connectToFlaskServer();
         }
         setUpForegroundNotification();
         return START_REDELIVER_INTENT;
@@ -229,7 +239,7 @@ public class LiveVideoService extends Service {
             this.remoteTimer.cancel();
             this.remoteTimer = null;
         }
-        if(this.flaskAPITimer!=null){
+        if (this.flaskAPITimer != null) {
             this.flaskAPITimer.cancel();
             this.flaskAPITimer = null;
         }
@@ -408,13 +418,60 @@ public class LiveVideoService extends Service {
         }
     }
 
-    private void connectToFlaskServer(){
+    private void connectToFlaskServer() {
         flaskAPITimer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 // your code here
+                if (currentFrameBitmap != null) {
+                    Log.i("FlaskThread:    ", "RUNNING");
+                    // Perform network operations here
+                    // Load the Bitmap from a drawable resource
+//                    Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+                    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                    currentFrameBitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+                    byte[] byteArray = stream.toByteArray();
+                    String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
+                    URL url = null;
+                    try {
+                        url = new URL(flaskAPIURL);
+                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection.setRequestMethod("POST");
+                        connection.setRequestProperty("Content-Type", "application/json");
+                        connection.setRequestProperty("Accept", "application/json");
+
+                        JSONObject jsonRequest = new JSONObject();
+                        jsonRequest.put("image", encodedImage);
+
+                        OutputStream outputStream = connection.getOutputStream();
+                        outputStream.write(jsonRequest.toString().getBytes());
+                        outputStream.flush();
+                        outputStream.close();
+
+                        int statusCode = connection.getResponseCode();
+                        Log.i("RESPONSE CODE:   ", String.valueOf(statusCode));
+                        if (statusCode == HttpURLConnection.HTTP_OK) {
+                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            String line;
+                            String response = "";
+                            while ((line = in.readLine()) != null) {
+                                response += line;
+                            }
+                            Log.i("RESPONSE:    ", response);
+                            in.close();
+                        }
+                    } catch (MalformedURLException e) {
+                        throw new RuntimeException(e);
+                    } catch (ProtocolException e) {
+                        throw new RuntimeException(e);
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    } catch (JSONException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
             }
         };
         // Schedule the timer to run every 2 seconds

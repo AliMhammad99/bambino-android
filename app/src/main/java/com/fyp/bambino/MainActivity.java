@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         RequestQueue queue = Volley.newRequestQueue(this);
 //        String url = "http://3666-34-86-115-151.ngrok-free.app/upload";
 
-        FlaskThread flaskThread = new FlaskThread();
-        flaskThread.start();
+//        FlaskThread flaskThread = new FlaskThread();
+//        flaskThread.start();
     }
 
     private class FlaskThread extends Thread {
