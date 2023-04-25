@@ -72,7 +72,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://3273-35-229-103-79.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://590f-34-125-171-47.ngrok-free.app/upload";
 
     @Override
     public void onCreate() {
@@ -287,7 +287,6 @@ public class LiveVideoService extends Service {
 
                                 if (huc.getResponseCode() == 200) {
                                     connectionEstablished();
-                                    updateForegroundNotification(1, 2, 0, 1);
                                     InputStream in = huc.getInputStream();
 
                                     InputStreamReader isr = new InputStreamReader(in);
@@ -421,7 +420,7 @@ public class LiveVideoService extends Service {
 
     private void connectToFlaskServer() {
         flaskAPITimer = new Timer();
-        currentFrameBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+//        currentFrameBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
