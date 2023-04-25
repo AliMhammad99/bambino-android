@@ -57,6 +57,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
         this.acceptCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 // Unlock the screen
                 KeyguardManager keyguardManager = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -68,6 +69,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
                         Intent intent = new Intent(EmergencyCallActivity.this, MainActivity.class);
                         intent.putExtra("FRAGMENT_TO_LOAD", "LIVE_VIDEO");
                         startActivity(intent);
+                        LiveVideoService.emergencyCallRunning = false;
                         finish();
                     }
                 }, 0);
@@ -77,6 +79,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
         this.rejectCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                LiveVideoService.emergencyCallRunning = false;
                 finish();
             }
         });

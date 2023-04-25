@@ -24,16 +24,29 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="165dp"
         android:layout_gravity="bottom"
         android:layout_marginHorizontal="50dp"
         android:layout_marginBottom="50dp">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="20dp"
+            android:background="@drawable/shp_emergency_call_content_back"
+            android:fontFamily="@font/gotham_medium"
+
+            android:text="Your baby is sleeping on his back!"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="23sp" />
 
         <ImageButton
             android:id="@+id/btn_accept_call"
             android:layout_width="75dp"
             android:layout_height="75dp"
-
+            android:layout_gravity="bottom"
             android:background="@drawable/shp_btn_back_enabled"
             android:focusable="true"
             android:foreground="@drawable/rpl_btn_back_white"
@@ -46,7 +59,7 @@
             android:id="@+id/btn_reject_call"
             android:layout_width="75dp"
             android:layout_height="75dp"
-            android:layout_gravity="right"
+            android:layout_gravity="bottom|right"
 
             android:background="@drawable/shp_btn_gray"
             android:focusable="true"

@@ -72,7 +72,9 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://590f-34-125-171-47.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://39f6-34-143-144-92.ngrok-free.app/upload";
+
+    public static boolean emergencyCallRunning = false;
 
     @Override
     public void onCreate() {
@@ -248,6 +250,7 @@ public class LiveVideoService extends Service {
 
     private void startEmergencyCall() {
         // Launch your activity
+        emergencyCallRunning = true;
         Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(activityIntent);
@@ -265,11 +268,6 @@ public class LiveVideoService extends Service {
                     if (!flashUpdating) {
                         counter++;
                         Log.i("COUNTER:  ", String.valueOf(counter));
-//                        if (counter == 3) {
-//                            startEmergencyCall();
-//
-//                        }
-//                            updateForegroundNotification(1, 2, 0, 1);
                         BufferedInputStream bis = null;
                         FileOutputStream fos = null;
                         try {
@@ -469,7 +467,9 @@ public class LiveVideoService extends Service {
                                 result[i] = jsonArray.getInt(i);
                             }
                             updateForegroundNotification(result[0],result[1],result[2],result[3]);
-
+                            if(result[1] == DANGER && !emergencyCallRunning){
+                                startEmergencyCall();
+                            }
 
                         } else {
                             updateForegroundNotification(NO_DATA, NO_DATA, NO_DATA, NO_DATA);
