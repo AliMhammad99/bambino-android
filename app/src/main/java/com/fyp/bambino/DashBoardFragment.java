@@ -91,6 +91,7 @@ public class DashBoardFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
         initUI(rootView);
+        startDashboardUpdater();
         return rootView;
     }
 
@@ -108,7 +109,7 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void run() {
                 // your code here
-
+                updateDashboard();
             }
         };
         // Schedule the timer to run every 2 seconds
@@ -116,63 +117,52 @@ public class DashBoardFragment extends Fragment {
     }
 
 
-    private void updateDashboard(int cell1, int cell2, int cell3, int cell4) {
+    private void updateDashboard() {
 
-        switch (cell1) {
+        switch (LiveVideoService.stateCell1) {
             case NORMAL:
-                setDashBoardCell("dashboard_cell1", R.drawable.ic_dashboard_incrib);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_incrib);
                 break;
             case DANGER:
-                setDashBoardCell("dashboard_cell1", R.drawable.ic_dashboard_nobaby);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_nobaby);
                 break;
             case NO_DATA:
-                setDashBoardCell("dashboard_cell1", R.drawable.ic_dashboard_nodata);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
-        switch (cell2) {
+        switch (LiveVideoService.stateCell2) {
             case NORMAL:
-                setDashBoardCell("dashboard_cell2", R.drawable.ic_dashboard_onback);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_onback);
                 break;
             case DANGER:
-                setDashBoardCell("dashboard_cell2", R.drawable.ic_dashboard_onface);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_onface);
                 break;
             case NO_DATA:
-                setDashBoardCell("dashboard_cell2", R.drawable.ic_dashboard_nodata);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
-        switch (cell3) {
+        switch (LiveVideoService.stateCell3) {
             case NORMAL:
-                setDashBoardCell("dashboard_cell3", R.drawable.ic_dashboard_covered);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_covered);
                 break;
             case DANGER:
-                setDashBoardCell("dashboard_cell3", R.drawable.ic_dashboard_uncovered);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_uncovered);
                 break;
             case NO_DATA:
-                setDashBoardCell("dashboard_cell3", R.drawable.ic_dashboard_nodata);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
-        switch (cell4) {
+        switch (LiveVideoService.stateCell4) {
             case NORMAL:
-                setDashBoardCell("dashboard_cell4", R.drawable.ic_dashboard_sleeping);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_sleeping);
                 break;
             case DANGER:
-                setDashBoardCell("dashboard_cell4", R.drawable.ic_dashboard_awake);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_awake);
                 break;
             case NO_DATA:
-                setDashBoardCell("dashboard_cell4", R.drawable.ic_dashboard_nodata);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
-        //Hide progress bar
-//        this.customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.GONE);
-        this.customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
-
-        this.foregroundNotification.setCustomContentView(customForegroundNotificationView);
-        this.startForeground(1001, foregroundNotification.build());
     }
 
-    private void setDashBoardCell(String imageViewId, int drawableSrcId) {
-        //Change an imageview src
-        int imageViewIdInt = getResources().getIdentifier(imageViewId, "id", getActivity().getPackageName());
-        this.customForegroundNotificationView.setImageViewResource(imageViewIdInt, drawableSrcId);
-    }
 }
