@@ -31,7 +31,7 @@
             android:layout_columnWeight="1"
 
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_dashboard_incrib" />
+            android:src="@drawable/ic_dashboard_nodata" />
 
         <ImageView
             android:id="@+id/dashboard_cell2"
@@ -41,7 +41,7 @@
             android:layout_columnWeight="1"
 
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_dashboard_onface" />
+            android:src="@drawable/ic_dashboard_nodata" />
 
         <ImageView
             android:id="@+id/dashboard_cell3"
@@ -50,7 +50,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_dashboard_covered" />
+            android:src="@drawable/ic_dashboard_nodata" />
 
         <ImageView
             android:id="@+id/dashboard_cell4"
@@ -59,7 +59,7 @@
             android:layout_rowWeight="1"
             android:layout_columnWeight="1"
             android:scaleType="centerCrop"
-            android:src="@drawable/ic_dashboard_awake" />
+            android:src="@drawable/ic_dashboard_nodata" />
 
     </GridLayout>
 

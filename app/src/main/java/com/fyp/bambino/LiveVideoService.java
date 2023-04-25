@@ -65,9 +65,9 @@ public class LiveVideoService extends Service {
     private RequestQueue requestQueue;
     private boolean shouldStop = false;
     private Context context = this;
-    final int NORMAL = 0;
-    final int DANGER = 1;
-    final int NO_DATA = 2;
+    public static final int NORMAL = 0;
+    public static final int DANGER = 1;
+    public static final int NO_DATA = 2;
 
     private String mode = "";
 
@@ -75,6 +75,11 @@ public class LiveVideoService extends Service {
     private String flaskAPIURL = "https://39f6-34-143-144-92.ngrok-free.app/upload";
 
     public static boolean emergencyCallRunning = false;
+
+    public static int stateCell1 = NO_DATA;
+    public static int stateCell2 = NO_DATA;
+    public static int stateCell3 = NO_DATA;
+    public static int stateCell4 = NO_DATA;
 
     @Override
     public void onCreate() {
@@ -150,7 +155,10 @@ public class LiveVideoService extends Service {
     }
 
     private void updateForegroundNotification(int cell1, int cell2, int cell3, int cell4) {
-
+        stateCell1 = cell1;
+        stateCell2 = cell2;
+        stateCell3 = cell3;
+        stateCell4 = cell4;
         switch (cell1) {
             case NORMAL:
                 setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_incrib);
