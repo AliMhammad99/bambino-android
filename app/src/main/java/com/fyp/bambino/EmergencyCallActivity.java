@@ -15,14 +15,20 @@ import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public class EmergencyCallActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ImageButton acceptCallButton;
     private ImageButton rejectCallButton;
     private Vibrator vibrator;
+
+    private ImageView ivLiveVideo;
+    private Timer liveVideoTimer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,7 +37,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
         getSupportActionBar().hide();
         turnOnScreen();
         initUI();
-
+        startLiveVideo();
         try {
             AssetFileDescriptor afd = getAssets().openFd("emergency_alarm.mp3");
             this.mediaPlayer = new MediaPlayer();
@@ -53,7 +59,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
     private void initUI() {
         this.acceptCallButton = this.findViewById(R.id.btn_accept_call);
         this.rejectCallButton = this.findViewById(R.id.btn_reject_call);
-
+        this.ivLiveVideo = this.findViewById(R.id.live_video);
         this.acceptCallButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -80,6 +86,14 @@ public class EmergencyCallActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 LiveVideoService.emergencyCallRunning = false;
+                // Get the Intent that started this activity
+//                Intent intent = getIntent();
+
+//                // Check if the Intent has any extras or data associated with it
+//                if (intent != null) {
+//                    startActivity(new Intent(EmergencyCallActivity.this, MainActivity.class));
+//                }
+
                 finish();
             }
         });
@@ -89,6 +103,19 @@ public class EmergencyCallActivity extends AppCompatActivity {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD |
                 WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
                 WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+    }
+
+    private void startLiveVideo() {
+        this.liveVideoTimer = new Timer();
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                if (LiveVideoService.currentFrameBitmap != null) {
+                    ivLiveVideo.setImageBitmap(LiveVideoService.currentFrameBitmap);
+                }
+            }
+        };
+        this.liveVideoTimer.schedule(timerTask, 0, 50);
     }
 
     @Override

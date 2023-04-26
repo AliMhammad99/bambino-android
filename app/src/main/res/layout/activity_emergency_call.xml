@@ -10,6 +10,7 @@
         android:id="@+id/live_video"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+
         android:scaleType="centerCrop" />
 
     <TextView
@@ -24,7 +25,7 @@
 
     <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="165dp"
+        android:layout_height="185dp"
         android:layout_gravity="bottom"
         android:layout_marginHorizontal="50dp"
         android:layout_marginBottom="50dp">
