@@ -72,7 +72,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://787e-35-226-130-50.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://761f-34-143-198-77.ngrok-free.app/upload";
 
     public static boolean emergencyCallRunning = false;
 
@@ -161,46 +161,46 @@ public class LiveVideoService extends Service {
         stateCell4 = cell4;
         switch (cell1) {
             case NORMAL:
-                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_incrib);
+                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_notification_incrib);
                 break;
             case DANGER:
-                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_nobaby);
+                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_notification_nobaby);
                 break;
             case NO_DATA:
-                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_nodata);
+                setImageViewInsideForegroundNotification("dashboard_cell1", R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         switch (cell2) {
             case NORMAL:
-                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_onback);
+                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_notification_onback);
                 break;
             case DANGER:
-                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_onface);
+                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_notification_onface);
                 break;
             case NO_DATA:
-                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_nodata);
+                setImageViewInsideForegroundNotification("dashboard_cell2", R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         switch (cell3) {
             case NORMAL:
-                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_covered);
+                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_notification_covered);
                 break;
             case DANGER:
-                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_uncovered);
+                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_notification_uncovered);
                 break;
             case NO_DATA:
-                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_nodata);
+                setImageViewInsideForegroundNotification("dashboard_cell3", R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         switch (cell4) {
             case NORMAL:
-                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_sleeping);
+                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_notification_sleeping);
                 break;
             case DANGER:
                 setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_awake);
                 break;
             case NO_DATA:
-                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_nodata);
+                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         //Hide progress bar

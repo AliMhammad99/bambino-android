@@ -4,31 +4,15 @@ import static com.fyp.bambino.LiveVideoService.DANGER;
 import static com.fyp.bambino.LiveVideoService.NORMAL;
 import static com.fyp.bambino.LiveVideoService.NO_DATA;
 
-import android.graphics.Bitmap;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
-import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -91,7 +75,7 @@ public class DashBoardFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
         initUI(rootView);
-        startDashboardUpdater();
+//        startDashboardUpdater();
         return rootView;
     }
 
@@ -121,46 +105,46 @@ public class DashBoardFragment extends Fragment {
 
         switch (LiveVideoService.stateCell1) {
             case NORMAL:
-                this.ivCell1.setImageResource(R.drawable.ic_dashboard_incrib);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_notification_incrib);
                 break;
             case DANGER:
-                this.ivCell1.setImageResource(R.drawable.ic_dashboard_nobaby);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_notification_nobaby);
                 break;
             case NO_DATA:
-                this.ivCell1.setImageResource(R.drawable.ic_dashboard_nodata);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         switch (LiveVideoService.stateCell2) {
             case NORMAL:
-                this.ivCell2.setImageResource(R.drawable.ic_dashboard_onback);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_notification_onback);
                 break;
             case DANGER:
-                this.ivCell2.setImageResource(R.drawable.ic_dashboard_onface);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_notification_onface);
                 break;
             case NO_DATA:
-                this.ivCell2.setImageResource(R.drawable.ic_dashboard_nodata);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         switch (LiveVideoService.stateCell3) {
             case NORMAL:
-                this.ivCell3.setImageResource(R.drawable.ic_dashboard_covered);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_notification_covered);
                 break;
             case DANGER:
-                this.ivCell3.setImageResource(R.drawable.ic_dashboard_uncovered);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_notification_uncovered);
                 break;
             case NO_DATA:
-                this.ivCell3.setImageResource(R.drawable.ic_dashboard_nodata);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
         switch (LiveVideoService.stateCell4) {
             case NORMAL:
-                this.ivCell4.setImageResource(R.drawable.ic_dashboard_sleeping);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_sleeping);
                 break;
             case DANGER:
                 this.ivCell4.setImageResource(R.drawable.ic_dashboard_awake);
                 break;
             case NO_DATA:
-                this.ivCell4.setImageResource(R.drawable.ic_dashboard_nodata);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_nodata);
                 break;
         }
     }

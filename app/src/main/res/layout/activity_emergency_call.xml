@@ -38,7 +38,7 @@
             android:background="@drawable/shp_emergency_call_content_back"
             android:fontFamily="@font/gotham_medium"
 
-            android:text="Your baby is sleeping on his back!"
+            android:text="Your baby is sleeping on his stomach!"
             android:textAlignment="center"
             android:textColor="@color/white"
             android:textSize="23sp" />
