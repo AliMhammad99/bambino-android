@@ -280,40 +280,43 @@ public class ConfigFragmentStep1 extends Fragment {
                     new String[]{Manifest.permission.BLUETOOTH_CONNECT},
                     BLUETOOTH_CONNECT_REQUEST_CODE);
         }
-        radioButton.setText(device.getName()); // or device.getAddress() depending on what you want to display
-        radioButton.setTag(device); // set the tag to the BluetoothDevice object to identify the selected device later
-        radioButton.setLayoutParams(new RadioGroup.LayoutParams(
-                RadioGroup.LayoutParams.MATCH_PARENT,
-                RadioGroup.LayoutParams.WRAP_CONTENT));
-        radioButton.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this.getContext(), R.color.beige)));
-        radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
-        radioButton.setTextColor(ContextCompat.getColor(this.getContext(), R.color.gray));
-        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
-        radioButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
-        radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
-                if (isChecked) {
-                    // RadioButton is checked
-                    RadioButton checkedRadioButton = (RadioButton) compoundButton;
-                    BluetoothDevice device = (BluetoothDevice) checkedRadioButton.getTag();
-                    if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(getActivity(),
-                                new String[]{Manifest.permission.BLUETOOTH_CONNECT},
-                                BLUETOOTH_CONNECT_REQUEST_CODE);
-                    }
-                    if (device.getName().equals("Bambino")) {
-                        currentBluetoothDevice = device;
-                        enableConnectButton();
-                    } else {
-                        currentBluetoothDevice = null;
-                        disableConnectButton();
-                    }
+        if (device != null && device.getName() != null && !device.getName().equals("")) {
+            radioButton.setText(device.getName()); // or device.getAddress() depending on what you want to display
+            radioButton.setTag(device); // set the tag to the BluetoothDevice object to identify the selected device later
+            radioButton.setLayoutParams(new RadioGroup.LayoutParams(
+                    RadioGroup.LayoutParams.MATCH_PARENT,
+                    RadioGroup.LayoutParams.WRAP_CONTENT));
+            radioButton.setButtonTintList(ColorStateList.valueOf(ContextCompat.getColor(this.getContext(), R.color.beige)));
+            radioButton.setTypeface(ResourcesCompat.getFont(this.getContext(), R.font.gotham_book));
+            radioButton.setTextColor(ContextCompat.getColor(this.getContext(), R.color.gray));
+            radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);
+            radioButton.setGravity(Gravity.LEFT | Gravity.CENTER_VERTICAL);
+            radioButton.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton compoundButton, boolean isChecked) {
+                    if (isChecked) {
+                        // RadioButton is checked
+                        RadioButton checkedRadioButton = (RadioButton) compoundButton;
+                        BluetoothDevice device = (BluetoothDevice) checkedRadioButton.getTag();
+                        if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+                            ActivityCompat.requestPermissions(getActivity(),
+                                    new String[]{Manifest.permission.BLUETOOTH_CONNECT},
+                                    BLUETOOTH_CONNECT_REQUEST_CODE);
+                        }
+                        if (device.getName().equals("Bambino")) {
+                            currentBluetoothDevice = device;
+                            enableConnectButton();
+                        } else {
+                            currentBluetoothDevice = null;
+                            disableConnectButton();
+                        }
 
+                    }
                 }
-            }
-        });
-        bluetoothDevicesRadioGroup.addView(radioButton);
+            });
+            bluetoothDevicesRadioGroup.addView(radioButton);
+        }
+
     }
 
     private void setUpBluetooth() {
