@@ -36,6 +36,8 @@ public class LiveVideoLocalFragment extends Fragment {
     private boolean flashOn = false;
     private String localURL = "http://192.168.43.239:80";
 
+    Thread threadStream;
+
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -87,8 +89,8 @@ public class LiveVideoLocalFragment extends Fragment {
 
 
         StreamThread streamThread = new StreamThread();
-        Thread thread = new Thread(streamThread);
-        thread.start();
+        this.threadStream = new Thread(streamThread);
+        this.threadStream.start();
 
         this.flashButton = rootView.findViewById(R.id.btn_flash);
         flashButton.setOnClickListener(new View.OnClickListener() {
@@ -132,7 +134,7 @@ public class LiveVideoLocalFragment extends Fragment {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
+//                        throw new RuntimeException(e);
                     }
                     continue;
                 }
@@ -232,5 +234,17 @@ public class LiveVideoLocalFragment extends Fragment {
             }
 
         }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        this.threadStream.interrupt();
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.threadStream.interrupt();
     }
 }

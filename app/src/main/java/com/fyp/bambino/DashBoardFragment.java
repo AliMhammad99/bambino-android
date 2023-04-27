@@ -149,4 +149,21 @@ public class DashBoardFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (this.updateDashBoardTimer != null) {
+            this.updateDashBoardTimer.cancel();
+            this.updateDashBoardTimer = null;
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (this.updateDashBoardTimer != null) {
+            this.updateDashBoardTimer.cancel();
+            this.updateDashBoardTimer = null;
+        }
+    }
 }

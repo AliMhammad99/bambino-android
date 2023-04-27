@@ -43,7 +43,7 @@ public class LiveVideoRemoteFragment extends Fragment {
     private ProgressBar progressBar;
     private ImageButton flashButton;
     private boolean flashOn = false;
-
+    Timer liveVideoTimer;
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -97,7 +97,7 @@ public class LiveVideoRemoteFragment extends Fragment {
         this.flashButton = rootView.findViewById(R.id.btn_flash);
 
         final Handler handler = new Handler();
-        Timer timer = new Timer();
+        this.liveVideoTimer = new Timer();
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
@@ -120,7 +120,7 @@ public class LiveVideoRemoteFragment extends Fragment {
             }
         };
         // Schedule the timer to run every 1 second
-        timer.schedule(timerTask, 0, 500);
+        this.liveVideoTimer.schedule(timerTask, 0, 500);
 
         this.flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,5 +180,23 @@ public class LiveVideoRemoteFragment extends Fragment {
 
     private void showFlashButton() {
         this.flashButton.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (this.liveVideoTimer != null) {
+            this.liveVideoTimer.cancel();
+            this.liveVideoTimer = null;
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (this.liveVideoTimer != null) {
+            this.liveVideoTimer.cancel();
+            this.liveVideoTimer = null;
+        }
     }
 }
