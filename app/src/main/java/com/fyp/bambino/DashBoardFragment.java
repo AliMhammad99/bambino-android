@@ -75,7 +75,7 @@ public class DashBoardFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
         initUI(rootView);
-//        startDashboardUpdater();
+        startDashboardUpdater();
         return rootView;
     }
 
@@ -105,46 +105,46 @@ public class DashBoardFragment extends Fragment {
 
         switch (LiveVideoService.stateCell1) {
             case NORMAL:
-                this.ivCell1.setImageResource(R.drawable.ic_dashboard_notification_incrib);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_incrib);
                 break;
             case DANGER:
-                this.ivCell1.setImageResource(R.drawable.ic_dashboard_notification_nobaby);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_nobaby);
                 break;
             case NO_DATA:
-                this.ivCell1.setImageResource(R.drawable.ic_dashboard_notification_nodata);
+                this.ivCell1.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
         switch (LiveVideoService.stateCell2) {
             case NORMAL:
-                this.ivCell2.setImageResource(R.drawable.ic_dashboard_notification_onback);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_onback);
                 break;
             case DANGER:
-                this.ivCell2.setImageResource(R.drawable.ic_dashboard_notification_onface);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_onface);
                 break;
             case NO_DATA:
-                this.ivCell2.setImageResource(R.drawable.ic_dashboard_notification_nodata);
+                this.ivCell2.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
         switch (LiveVideoService.stateCell3) {
             case NORMAL:
-                this.ivCell3.setImageResource(R.drawable.ic_dashboard_notification_covered);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_covered);
                 break;
             case DANGER:
-                this.ivCell3.setImageResource(R.drawable.ic_dashboard_notification_uncovered);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_uncovered);
                 break;
             case NO_DATA:
-                this.ivCell3.setImageResource(R.drawable.ic_dashboard_notification_nodata);
+                this.ivCell3.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
         switch (LiveVideoService.stateCell4) {
             case NORMAL:
-                this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_sleeping);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_sleeping);
                 break;
             case DANGER:
-                this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_awake);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_awake);
                 break;
             case NO_DATA:
-                this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_nodata);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_nodata);
                 break;
         }
     }
