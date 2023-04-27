@@ -197,7 +197,7 @@ public class LiveVideoService extends Service {
                 setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_notification_sleeping);
                 break;
             case DANGER:
-                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_awake);
+                setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_notification_awake);
                 break;
             case NO_DATA:
                 setImageViewInsideForegroundNotification("dashboard_cell4", R.drawable.ic_dashboard_notification_nodata);

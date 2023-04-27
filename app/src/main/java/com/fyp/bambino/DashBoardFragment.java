@@ -141,7 +141,7 @@ public class DashBoardFragment extends Fragment {
                 this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_sleeping);
                 break;
             case DANGER:
-                this.ivCell4.setImageResource(R.drawable.ic_dashboard_awake);
+                this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_awake);
                 break;
             case NO_DATA:
                 this.ivCell4.setImageResource(R.drawable.ic_dashboard_notification_nodata);

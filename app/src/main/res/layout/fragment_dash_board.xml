@@ -31,7 +31,7 @@
             android:layout_marginHorizontal="20dp"
 
             android:layout_marginBottom="5dp"
-            android:src="@drawable/ic_dashboard_incrib" />
+            android:src="@drawable/ic_dashboard_nobaby" />
 
         <ImageView
             android:id="@+id/dashboard_cell2"
@@ -39,7 +39,7 @@
             android:layout_height="100dp"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="5dp"
-            android:src="@drawable/ic_dashboard_incrib" />
+            android:src="@drawable/ic_dashboard_nodata" />
 
         <ImageView
             android:id="@+id/dashboard_cell3"
@@ -47,7 +47,7 @@
             android:layout_height="100dp"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="5dp"
-            android:src="@drawable/ic_dashboard_incrib" />
+            android:src="@drawable/ic_dashboard_covered" />
 
         <ImageView
             android:id="@+id/dashboard_cell4"
@@ -55,7 +55,7 @@
             android:layout_height="100dp"
             android:layout_marginHorizontal="20dp"
             android:layout_marginBottom="5dp"
-            android:src="@drawable/ic_dashboard_incrib" />
+            android:src="@drawable/ic_dashboard_awake" />
 
     </LinearLayout>
 
