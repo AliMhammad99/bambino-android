@@ -114,7 +114,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
                 }
             }
         };
-        this.liveVideoTimer.schedule(timerTask, 0, 50);
+        this.liveVideoTimer.schedule(timerTask, 0, 200);
     }
 
     @Override

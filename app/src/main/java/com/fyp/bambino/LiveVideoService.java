@@ -72,7 +72,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://3be1-34-142-220-199.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://389d-35-240-203-61.ngrok-free.app/upload";
 
     public static boolean emergencyCallRunning = false;
 

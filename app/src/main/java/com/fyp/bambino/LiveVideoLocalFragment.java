@@ -138,6 +138,14 @@ public class LiveVideoLocalFragment extends Fragment {
                     }
                     continue;
                 }
+                if(LiveVideoService.emergencyCallRunning){
+                    try {
+                        Thread.sleep(300);
+                    } catch (InterruptedException e) {
+//                        throw new RuntimeException(e);
+                    }
+                    continue;
+                }
 
                 File file = new File(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0A.jpg");
                 if (file.exists()) {
