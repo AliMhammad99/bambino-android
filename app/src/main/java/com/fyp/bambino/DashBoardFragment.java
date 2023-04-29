@@ -8,6 +8,7 @@ import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -151,6 +152,7 @@ public class DashBoardFragment extends Fragment {
 
     @Override
     public void onDestroy() {
+        Log.i("Destroying Dashboard","!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroy();
         if (this.updateDashBoardTimer != null) {
             this.updateDashBoardTimer.cancel();
@@ -160,6 +162,7 @@ public class DashBoardFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
+        Log.i("Destroying Dashboard View","!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroyView();
         if (this.updateDashBoardTimer != null) {
             this.updateDashBoardTimer.cancel();

@@ -25,7 +25,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
     private MediaPlayer mediaPlayer;
     private ImageButton acceptCallButton;
     private ImageButton rejectCallButton;
-    private Vibrator vibrator;
+//    private Vibrator vibrator;
 
     private ImageView ivLiveVideo;
     private Timer liveVideoTimer;
@@ -119,11 +119,17 @@ public class EmergencyCallActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
+        Log.i("Destroying Emergency Call","!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
 //        if (vibrator != null) {
 //            vibrator.cancel(); // Stop the vibration pattern
 //        }
+        if (this.liveVideoTimer != null) {
+            this.liveVideoTimer.cancel();
+            this.liveVideoTimer = null;
+        }
     }
+
 }

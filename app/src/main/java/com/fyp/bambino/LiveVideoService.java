@@ -72,7 +72,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://c087-34-91-33-141.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://3be1-34-142-220-199.ngrok-free.app/upload";
 
     public static boolean emergencyCallRunning = false;
 
@@ -443,9 +443,10 @@ public class LiveVideoService extends Service {
                     String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
 
                     URL url = null;
+                    HttpURLConnection connection = null;
                     try {
                         url = new URL(flaskAPIURL);
-                        HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                        connection = (HttpURLConnection) url.openConnection();
                         connection.setRequestMethod("POST");
                         connection.setRequestProperty("Content-Type", "application/json");
                         connection.setRequestProperty("Accept", "application/json");
@@ -461,27 +462,29 @@ public class LiveVideoService extends Service {
                         int statusCode = connection.getResponseCode();
                         Log.i("RESPONSE CODE:   ", String.valueOf(statusCode));
                         if (statusCode == HttpURLConnection.HTTP_OK) {
-                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                            String line;
-                            String response = "";
-                            while ((line = in.readLine()) != null) {
-                                response += line;
+//                            BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+                            try (BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+                                String line;
+                                String response = "";
+                                while ((line = in.readLine()) != null) {
+                                    response += line;
+                                }
+                                Log.i("RESPONSE:    ", response);
+                                in.close();
+                                JSONArray jsonArray = new JSONArray(response); //replace responseString with the actual response from the API
+                                int[] result = new int[jsonArray.length()];
+                                for (int i = 0; i < jsonArray.length(); i++) {
+                                    result[i] = jsonArray.getInt(i);
+                                }
+                                updateForegroundNotification(result[0], result[1], result[2], result[3]);
+                                if (result[1] == DANGER && !emergencyCallRunning) {
+                                    startEmergencyCall();
+                                }
                             }
-                            Log.i("RESPONSE:    ", response);
-                            in.close();
-                            JSONArray jsonArray = new JSONArray(response); //replace responseString with the actual response from the API
-                            int[] result = new int[jsonArray.length()];
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                result[i] = jsonArray.getInt(i);
-                            }
-                            updateForegroundNotification(result[0],result[1],result[2],result[3]);
-                            if(result[1] == DANGER && !emergencyCallRunning){
-                                startEmergencyCall();
-                            }
-
                         } else {
                             updateForegroundNotification(NO_DATA, NO_DATA, NO_DATA, NO_DATA);
                         }
+
                     } catch (MalformedURLException e) {
                         e.printStackTrace();
                     } catch (ProtocolException e) {
@@ -490,6 +493,10 @@ public class LiveVideoService extends Service {
                         e.printStackTrace();
                     } catch (JSONException e) {
                         e.printStackTrace();
+                    } finally {
+                        if (connection != null) {
+                            connection.disconnect();
+                        }
                     }
                 }
             }
