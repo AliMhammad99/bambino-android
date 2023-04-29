@@ -38,21 +38,20 @@ public class EmergencyCallActivity extends AppCompatActivity {
         turnOnScreen();
         initUI();
         startLiveVideo();
-        try {
-            AssetFileDescriptor afd = getAssets().openFd("emergency_alarm.mp3");
-            this.mediaPlayer = new MediaPlayer();
+        try (AssetFileDescriptor afd = getAssets().openFd("emergency_alarm.mp3")) {
+            mediaPlayer = new MediaPlayer();
             mediaPlayer.setDataSource(afd.getFileDescriptor(), afd.getStartOffset(), afd.getLength());
             mediaPlayer.prepare();
             mediaPlayer.start();
             mediaPlayer.setLooping(true);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+//            throw new RuntimeException(e);
         }
-        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-        if (vibrator.hasVibrator()) {
-            long[] pattern = {0, 1000}; // Vibrate for 1 second, then pause for 1 second
-            vibrator.vibrate(pattern, 0); // Start the vibration pattern
-        }
+//        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+//        if (vibrator.hasVibrator()) {
+//            long[] pattern = {0, 1000}; // Vibrate for 1 second, then pause for 1 second
+//            vibrator.vibrate(pattern, 0); // Start the vibration pattern
+//        }
 
     }
 
@@ -123,8 +122,8 @@ public class EmergencyCallActivity extends AppCompatActivity {
         super.onDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
-        if (vibrator != null) {
-            vibrator.cancel(); // Stop the vibration pattern
-        }
+//        if (vibrator != null) {
+//            vibrator.cancel(); // Stop the vibration pattern
+//        }
     }
 }
