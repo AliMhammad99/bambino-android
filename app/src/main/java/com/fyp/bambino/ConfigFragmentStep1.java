@@ -209,6 +209,7 @@ public class ConfigFragmentStep1 extends Fragment {
     }
 
     private void requestBlueToothScanPermission() {
+
         if (ActivityCompat.checkSelfPermission(this.getContext(), Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this.getActivity(),
                     new String[]{Manifest.permission.BLUETOOTH_SCAN},
@@ -330,6 +331,7 @@ public class ConfigFragmentStep1 extends Fragment {
 
 
     private void turnOnBluetooth() {
+        isScanReceiverRegistered = false;
         if (!this.bluetoothAdapter.isEnabled()) {
             Intent enableBTIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             ActivityResultLauncher<Intent> enableBtLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), result -> {
