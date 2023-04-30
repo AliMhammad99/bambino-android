@@ -1,14 +1,21 @@
 package com.fyp.bambino;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
 
 import android.app.ActivityManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -60,11 +67,11 @@ public class MainActivity extends AppCompatActivity {
         setupMode();
         String fragmentName = getIntent().getStringExtra("FRAGMENT_TO_LOAD");
 
-
         if (fragmentName != null && fragmentName.equals("LIVE_VIDEO")) {
             Log.i("FRAGMENT NAME:  ", fragmentName);
             this.liveVideoButton.performClick();
         }
+
     }
 
 

@@ -10,6 +10,9 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -20,6 +23,8 @@ import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 import androidx.annotation.Nullable;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
 
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -72,7 +77,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://8e66-34-27-96-14.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://5709-34-142-198-100.ngrok-free.app/upload";
 
     public static boolean emergencyCallRunning = false;
 
@@ -84,8 +89,6 @@ public class LiveVideoService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
-
-
     }
 
     @Override
@@ -262,6 +265,41 @@ public class LiveVideoService extends Service {
         Intent activityIntent = new Intent(context, EmergencyCallActivity.class);
         activityIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(activityIntent);
+    }
+
+    private void startNotification(int id, String title, String content) {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+//            CharSequence name = getString(R.string.channel_name);
+//            String description = getString(R.string.channel_description);
+            NotificationChannel channel = new NotificationChannel(String.valueOf(id), "Bambino Detection", NotificationManager.IMPORTANCE_HIGH);
+            channel.setDescription("Bambino Detection");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+
+            // Create an explicit intent for an Activity in your app
+            Intent intent = new Intent(this, MainActivity.class);
+            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
+            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(this, String.valueOf(id))
+                    .setSmallIcon(R.drawable.ic_bambino)
+                    .setContentTitle(title)
+                    .setContentText(content)
+                    .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                    // Set the intent that will fire when the user taps the notification
+                    .setContentIntent(pendingIntent)
+                    .setAutoCancel(true)
+                    .setSound(soundUri)
+                    .setOnlyAlertOnce(true);
+
+            NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
+
+            // notificationId is a unique int for each notification that you must define
+            notificationManagerCompat.notify(id, builder.build());
+        }
     }
 
     private void startLocalLiveVideo() {
@@ -477,8 +515,14 @@ public class LiveVideoService extends Service {
                                     result[i] = jsonArray.getInt(i);
                                 }
                                 updateForegroundNotification(result[0], result[1], result[2], result[3]);
+                                if (result[0] == DANGER) {
+                                    startNotification(104, "Bambino Detection", "Your baby is not in his crib!");
+                                }
                                 if (result[1] == DANGER && !emergencyCallRunning) {
                                     startEmergencyCall();
+                                }
+                                if (result[2] == DANGER) {
+                                    startNotification(103, "Bambino Detection", "Your baby is not covered!");
                                 }
                             }
                         } else {
