@@ -76,7 +76,7 @@ public class DashBoardFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
         initUI(rootView);
-        startDashboardUpdater();
+//        startDashboardUpdater();
         return rootView;
     }
 
@@ -94,6 +94,7 @@ public class DashBoardFragment extends Fragment {
             @Override
             public void run() {
                 // your code here
+                Log.i("Updating Dashboard........","............");
                 updateDashboard();
             }
         };
@@ -163,6 +164,17 @@ public class DashBoardFragment extends Fragment {
     @Override
     public void onDestroyView() {
         Log.i("Destroying Dashboard View","!!!!!!!!!!!!!!!!!!!!!!!");
+        super.onDestroyView();
+        if (this.updateDashBoardTimer != null) {
+            this.updateDashBoardTimer.cancel();
+            this.updateDashBoardTimer = null;
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.i("Detaching Dashboard View","!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroyView();
         if (this.updateDashBoardTimer != null) {
             this.updateDashBoardTimer.cancel();

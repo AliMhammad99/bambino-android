@@ -55,10 +55,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         getSupportActionBar().hide();
-//        SharedPreferences sharedPreferences = getSharedPreferences("bambino", Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putString("mode", "1");
-//        editor.apply();
         initUI();
         loadModeFromSharedPreferences();
         setupMode();
@@ -69,66 +65,8 @@ public class MainActivity extends AppCompatActivity {
             Log.i("FRAGMENT NAME:  ", fragmentName);
             this.liveVideoButton.performClick();
         }
-
-        // Instantiate the RequestQueue.
-        RequestQueue queue = Volley.newRequestQueue(this);
-//        String url = "http://3666-34-86-115-151.ngrok-free.app/upload";
-
-//        FlaskThread flaskThread = new FlaskThread();
-//        flaskThread.start();
     }
 
-    private class FlaskThread extends Thread {
-        @Override
-        public void run() {
-            Log.i("FlaskThread:    ", "RUNNING");
-            // Perform network operations here
-            // Load the Bitmap from a drawable resource
-            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
-            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-            URL url = null;
-            try {
-                url = new URL("https://e5a8-35-204-88-29.ngrok-free.app/upload");
-                HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Content-Type", "application/json");
-                connection.setRequestProperty("Accept", "application/json");
-
-                JSONObject jsonRequest = new JSONObject();
-                jsonRequest.put("image", encodedImage);
-
-                OutputStream outputStream = connection.getOutputStream();
-                outputStream.write(jsonRequest.toString().getBytes());
-                outputStream.flush();
-                outputStream.close();
-
-                int statusCode = connection.getResponseCode();
-                Log.i("RESPONSE CODE:   ", String.valueOf(statusCode));
-                if (statusCode == HttpURLConnection.HTTP_OK) {
-                    BufferedReader in = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-                    String line;
-                    String response = "";
-                    while ((line = in.readLine()) != null) {
-                        response += line;
-                    }
-                    Log.i("RESPONSE:    ", response);
-                    in.close();
-                }
-            } catch (MalformedURLException e) {
-                throw new RuntimeException(e);
-            } catch (ProtocolException e) {
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (JSONException e) {
-                throw new RuntimeException(e);
-            }
-        }
-    }
 
     private void initUI() {
         this.dashboardButton = this.findViewById(R.id.btn_dashboard);
@@ -278,4 +216,6 @@ public class MainActivity extends AppCompatActivity {
         }
         return false;
     }
+
+
 }

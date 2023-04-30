@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.os.Environment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -118,10 +119,12 @@ public class LiveVideoLocalFragment extends Fragment {
     }
 
     private class StreamThread implements Runnable {
+        private volatile boolean keepRunning = true;
 
         @Override
         public void run() {
-            while (true) {
+            while (keepRunning) {
+                Log.i("Rendering Live Video", ".............");
                 if (LiveVideoService.connectionLost) {
 
                     fragmentActivity.runOnUiThread(new Runnable() {
@@ -134,15 +137,15 @@ public class LiveVideoLocalFragment extends Fragment {
                     try {
                         Thread.sleep(2000);
                     } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
+                        throw new RuntimeException(e);
                     }
                     continue;
                 }
-                if(LiveVideoService.emergencyCallRunning){
+                if (LiveVideoService.emergencyCallRunning) {
                     try {
                         Thread.sleep(300);
                     } catch (InterruptedException e) {
-//                        throw new RuntimeException(e);
+                        throw new RuntimeException(e);
                     }
                     continue;
                 }
@@ -169,7 +172,9 @@ public class LiveVideoLocalFragment extends Fragment {
 
         }
 
-
+        public void stopStreamThread() {
+            keepRunning = false;
+        }
     }
 
     private void showProgressBar() {
@@ -247,12 +252,25 @@ public class LiveVideoLocalFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        this.threadStream.interrupt();
+        Log.i("Destorying Live Video Local View", "..........");
+//        this.threadStreamRunning = false;
+//        this.threadStream.interrupt();
+    this.threadStream.();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
+        Log.i("Destorying Live Video Local", "..........");
+        this.threadStreamRunning = false;
         this.threadStream.interrupt();
     }
+//
+//    @Override
+//    public void onDetach() {
+//        super.onDetach();
+//        Log.i("Destorying Live Video Local", "..........");
+//        this.threadStreamRunning = false;
+//        this.threadStream.interrupt();
+//    }
 }
