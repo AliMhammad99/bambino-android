@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,8 +38,7 @@ public class LiveVideoLocalFragment extends Fragment {
     private ProgressBar progressBar;
     private boolean flashOn = false;
     private String localURL = "http://192.168.43.239:80";
-
-    Thread threadStream;
+    private Timer updateLiveVideoTimer;
 
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -88,11 +89,7 @@ public class LiveVideoLocalFragment extends Fragment {
         fragmentActivity = getActivity();
         this.progressBar = rootView.findViewById(R.id.progressBar);
 
-
-        StreamThread streamThread = new StreamThread();
-        this.threadStream = new Thread(streamThread);
-        this.threadStream.start();
-
+        this.startLiveVideoUpdater();
         this.flashButton = rootView.findViewById(R.id.btn_flash);
         flashButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -118,62 +115,46 @@ public class LiveVideoLocalFragment extends Fragment {
         return rootView;
     }
 
-    private class StreamThread implements Runnable {
-        private volatile boolean keepRunning = true;
+    private void startLiveVideoUpdater() {
+        this.updateLiveVideoTimer = new Timer();
+//        currentFrameBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                // your code here
+                Log.i("Updating Live Video........", "............");
+                updateLiveVideo();
+            }
+        };
+        // Schedule the timer to run every 2 seconds
+        this.updateLiveVideoTimer.schedule(timerTask, 0, 33);
+    }
 
-        @Override
-        public void run() {
-            while (keepRunning) {
-                Log.i("Rendering Live Video", ".............");
-                if (LiveVideoService.connectionLost) {
-
-                    fragmentActivity.runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            hideFlashButton();
-                            showProgressBar();
-                        }
-                    });
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    continue;
+    private void updateLiveVideo() {
+        Log.i("Rendering Live Video", ".............");
+        if (LiveVideoService.connectionLost) {
+            fragmentActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    hideFlashButton();
+                    showProgressBar();
                 }
-                if (LiveVideoService.emergencyCallRunning) {
-                    try {
-                        Thread.sleep(300);
-                    } catch (InterruptedException e) {
-                        throw new RuntimeException(e);
-                    }
-                    continue;
-                }
-
-                File file = new File(fragmentActivity.getExternalFilesDir(Environment.DIRECTORY_PICTURES), "0A.jpg");
-                if (file.exists()) {
-                    final Bitmap responseBitmap = BitmapFactory.decodeFile(file.getAbsolutePath());
-                    // render the bitmap
-                    if (responseBitmap != null) {
-                        fragmentActivity.runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                showFlashButton();
-                                hideProgressBar();
-                                ivLiveVideo.setImageBitmap(LiveVideoService.currentFrameBitmap);
-                            }
-                        });
-                    }
-                }
-
-//                }
+            });
+            try {
+                Thread.sleep(2000);
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
             }
 
-
-        }
-
-        public void stopStreamThread() {
-            keepRunning = false;
+        } else {
+            fragmentActivity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showFlashButton();
+                    hideProgressBar();
+                    ivLiveVideo.setImageBitmap(LiveVideoService.currentFrameBitmap);
+                }
+            });
         }
     }
 
@@ -253,24 +234,20 @@ public class LiveVideoLocalFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         Log.i("Destorying Live Video Local View", "..........");
-//        this.threadStreamRunning = false;
-//        this.threadStream.interrupt();
-    this.threadStream.();
+        if (this.updateLiveVideoTimer != null) {
+            this.updateLiveVideoTimer.cancel();
+            this.updateLiveVideoTimer = null;
+        }
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         Log.i("Destorying Live Video Local", "..........");
-        this.threadStreamRunning = false;
-        this.threadStream.interrupt();
+        if (this.updateLiveVideoTimer != null) {
+            this.updateLiveVideoTimer.cancel();
+            this.updateLiveVideoTimer = null;
+        }
     }
-//
-//    @Override
-//    public void onDetach() {
-//        super.onDetach();
-//        Log.i("Destorying Live Video Local", "..........");
-//        this.threadStreamRunning = false;
-//        this.threadStream.interrupt();
-//    }
+
 }

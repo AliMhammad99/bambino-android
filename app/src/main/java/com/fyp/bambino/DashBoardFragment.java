@@ -23,7 +23,7 @@ import java.util.TimerTask;
  * create an instance of this fragment.
  */
 public class DashBoardFragment extends Fragment {
-    Timer updateDashBoardTimer;
+    private Timer updateDashBoardTimer;
 
     private ImageView ivCell1;
     private ImageView ivCell2;
@@ -76,7 +76,7 @@ public class DashBoardFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_dash_board, container, false);
         initUI(rootView);
-//        startDashboardUpdater();
+        startDashboardUpdater();
         return rootView;
     }
 
@@ -89,12 +89,11 @@ public class DashBoardFragment extends Fragment {
 
     private void startDashboardUpdater() {
         this.updateDashBoardTimer = new Timer();
-//        currentFrameBitmap = BitmapFactory.decodeResource(getResources(), R.drawable.image);
         TimerTask timerTask = new TimerTask() {
             @Override
             public void run() {
                 // your code here
-                Log.i("Updating Dashboard........","............");
+                Log.i("Updating Dashboard........", "............");
                 updateDashboard();
             }
         };
@@ -153,7 +152,7 @@ public class DashBoardFragment extends Fragment {
 
     @Override
     public void onDestroy() {
-        Log.i("Destroying Dashboard","!!!!!!!!!!!!!!!!!!!!!!!");
+        Log.i("Destroying Dashboard", "!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroy();
         if (this.updateDashBoardTimer != null) {
             this.updateDashBoardTimer.cancel();
@@ -163,7 +162,7 @@ public class DashBoardFragment extends Fragment {
 
     @Override
     public void onDestroyView() {
-        Log.i("Destroying Dashboard View","!!!!!!!!!!!!!!!!!!!!!!!");
+        Log.i("Destroying Dashboard View", "!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroyView();
         if (this.updateDashBoardTimer != null) {
             this.updateDashBoardTimer.cancel();
@@ -174,7 +173,7 @@ public class DashBoardFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.i("Detaching Dashboard View","!!!!!!!!!!!!!!!!!!!!!!!");
+        Log.i("Detaching Dashboard View", "!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroyView();
         if (this.updateDashBoardTimer != null) {
             this.updateDashBoardTimer.cancel();
