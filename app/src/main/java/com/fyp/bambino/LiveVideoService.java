@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.AudioAttributes;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -78,7 +79,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://f2df-35-202-114-91.ngrok-free.app//upload";
+    private String flaskAPIURL = "https://9974-34-70-206-32.ngrok-free.app/upload";
 
     public static boolean emergencyCallRunning = false;
 
@@ -86,6 +87,8 @@ public class LiveVideoService extends Service {
     public static int stateCell2 = NO_DATA;
     public static int stateCell3 = NO_DATA;
     public static int stateCell4 = NO_DATA;
+
+    public static boolean emergencyCallEnabled = true;
 
     @Override
     public void onCreate() {
@@ -275,6 +278,8 @@ public class LiveVideoService extends Service {
 //            String description = getString(R.string.channel_description);
             NotificationChannel channel = new NotificationChannel(String.valueOf(id), "Bambino Detection", NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Bambino Detection");
+
+            channel.setSound(Uri.parse("android.resource://" + getPackageName() + "/" + R.raw.notification_sound), new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION).build());
             // Register the channel with the system; you can't change the importance
             // or other notification behaviors after this
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
@@ -286,7 +291,6 @@ public class LiveVideoService extends Service {
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
 //            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
             // Replace "custom_sound" with the name of your custom sound file in the raw folder
-            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.notification_sound);
 //            Uri soundUri = Uri.parse("android.resource://" + getPackageName() + "/"+R.raw.notification_sound);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, String.valueOf(id))
                     .setSmallIcon(R.drawable.ic_bambino)
@@ -298,8 +302,7 @@ public class LiveVideoService extends Service {
                     .setAutoCancel(true)
 //                    .setSound(soundUri)
                     .setOnlyAlertOnce(true);
-// Start the media player
-            mediaPlayer.start();
+
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
 
             // notificationId is a unique int for each notification that you must define
@@ -520,14 +523,21 @@ public class LiveVideoService extends Service {
                                     result[i] = jsonArray.getInt(i);
                                 }
                                 updateForegroundNotification(result[0], result[1], result[2], result[3]);
-                                if (result[0] == DANGER) {
-                                    startNotification(104, "Bambino Detection", "Your baby is not in his crib!");
-                                }
-                                if (result[1] == DANGER && !emergencyCallRunning) {
-                                    startEmergencyCall();
-                                }
-                                if (result[2] == DANGER) {
-                                    startNotification(103, "Bambino Detection", "Your baby is not covered!");
+
+                                if (!emergencyCallRunning) {
+                                    if (result[1] == DANGER) {
+                                        if (emergencyCallEnabled) {
+                                            LiveVideoService.emergencyCallEnabled = false;
+                                            startEmergencyCall();
+                                        }
+                                    } else {
+                                        if (result[0] == DANGER) {
+                                            startNotification(104, "Bambino Detection", "Your baby is not in his crib!");
+                                        }
+                                        if (result[2] == DANGER) {
+                                            startNotification(103, "Bambino Detection", "Your baby is not covered!");
+                                        }
+                                    }
                                 }
                             }
                         } else {

@@ -47,12 +47,6 @@ public class EmergencyCallActivity extends AppCompatActivity {
         } catch (IOException e) {
 //            throw new RuntimeException(e);
         }
-//        vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
-//        if (vibrator.hasVibrator()) {
-//            long[] pattern = {0, 1000}; // Vibrate for 1 second, then pause for 1 second
-//            vibrator.vibrate(pattern, 0); // Start the vibration pattern
-//        }
-
     }
 
     private void initUI() {
@@ -78,6 +72,7 @@ public class EmergencyCallActivity extends AppCompatActivity {
                         finish();
                     }
                 }, 0);
+                reEnableEmergencyCallAfterDelay();
             }
         });
 
@@ -86,15 +81,10 @@ public class EmergencyCallActivity extends AppCompatActivity {
             public void onClick(View view) {
                 LiveVideoService.emergencyCallRunning = false;
                 // Get the Intent that started this activity
-//                Intent intent = getIntent();
-
-//                // Check if the Intent has any extras or data associated with it
-//                if (intent != null) {
-//                    startActivity(new Intent(EmergencyCallActivity.this, MainActivity.class));
-//                }
-
                 finish();
+                reEnableEmergencyCallAfterDelay();
             }
+
         });
     }
 
@@ -117,19 +107,26 @@ public class EmergencyCallActivity extends AppCompatActivity {
         this.liveVideoTimer.schedule(timerTask, 0, 200);
     }
 
+    private void reEnableEmergencyCallAfterDelay() {
+        new Handler().postDelayed(new Runnable() {
+            public void run() {
+                LiveVideoService.emergencyCallEnabled = true;
+            }
+        }, 10000);
+    }
+
     @Override
     protected void onDestroy() {
-        Log.i("Destroying Emergency Call","!!!!!!!!!!!!!!!!!!!!!!!");
+        Log.i("Destroying Emergency Call", "!!!!!!!!!!!!!!!!!!!!!!!");
         super.onDestroy();
         mediaPlayer.stop();
         mediaPlayer.release();
-//        if (vibrator != null) {
-//            vibrator.cancel(); // Stop the vibration pattern
-//        }
         if (this.liveVideoTimer != null) {
             this.liveVideoTimer.cancel();
             this.liveVideoTimer = null;
         }
+
+
     }
 
 }
