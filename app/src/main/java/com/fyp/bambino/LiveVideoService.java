@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
@@ -77,7 +78,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://5709-34-142-198-100.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://f2df-35-202-114-91.ngrok-free.app//upload";
 
     public static boolean emergencyCallRunning = false;
 
@@ -283,7 +284,10 @@ public class LiveVideoService extends Service {
             Intent intent = new Intent(this, MainActivity.class);
             intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
             PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_IMMUTABLE);
-            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+//            Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            // Replace "custom_sound" with the name of your custom sound file in the raw folder
+            MediaPlayer mediaPlayer = MediaPlayer.create(this, R.raw.notification_sound);
+//            Uri soundUri = Uri.parse("android.resource://" + getPackageName() + "/"+R.raw.notification_sound);
             NotificationCompat.Builder builder = new NotificationCompat.Builder(this, String.valueOf(id))
                     .setSmallIcon(R.drawable.ic_bambino)
                     .setContentTitle(title)
@@ -292,9 +296,10 @@ public class LiveVideoService extends Service {
                     // Set the intent that will fire when the user taps the notification
                     .setContentIntent(pendingIntent)
                     .setAutoCancel(true)
-                    .setSound(soundUri)
+//                    .setSound(soundUri)
                     .setOnlyAlertOnce(true);
-
+// Start the media player
+            mediaPlayer.start();
             NotificationManagerCompat notificationManagerCompat = NotificationManagerCompat.from(this);
 
             // notificationId is a unique int for each notification that you must define
