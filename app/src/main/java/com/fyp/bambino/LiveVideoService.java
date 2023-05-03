@@ -79,7 +79,7 @@ public class LiveVideoService extends Service {
     private String mode = "";
 
     private Timer flaskAPITimer;
-    private String flaskAPIURL = "https://9974-34-70-206-32.ngrok-free.app/upload";
+    private String flaskAPIURL = "https://8a77-34-83-115-34.ngrok-free.app//upload";
 
     public static boolean emergencyCallRunning = false;
 
@@ -536,6 +536,9 @@ public class LiveVideoService extends Service {
                                         }
                                         if (result[2] == DANGER) {
                                             startNotification(103, "Bambino Detection", "Your baby is not covered!");
+                                        }
+                                        if(result[3] == DANGER){
+                                            startNotification(102, "Bambino Detection", "Your baby is awake!");
                                         }
                                     }
                                 }
