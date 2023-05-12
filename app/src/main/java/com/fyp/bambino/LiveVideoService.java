@@ -537,7 +537,7 @@ public class LiveVideoService extends Service {
                                         if (result[2] == DANGER) {
                                             startNotification(103, "Bambino Detection", "Your baby is not covered!");
                                         }
-                                        if(result[3] == DANGER){
+                                        if (result[3] == DANGER) {
                                             startNotification(102, "Bambino Detection", "Your baby is awake!");
                                         }
                                     }
