@@ -59,7 +59,7 @@ import java.util.TimerTask;
 public class LiveVideoService extends Service {
 
 
-    int counter;
+
     RemoteViews customForegroundNotificationView;
     Notification.Builder foregroundNotification;
 
@@ -97,18 +97,17 @@ public class LiveVideoService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        counter = 0;
         if ("stop".equals(intent.getAction())) {
-            Log.i("STOPPPPPPPPPP", "STOPPPPPPPPPP");
+//            Log.i("STOPPPPPPPPPP", "STOPPPPPPPPPP");
             stop();
         } else if ("local".equals(intent.getAction())) {
 //            stop();
-            Log.i("LOCALLLLLLLLLLLLL", "LOCALLLLLLLLLLLLL");
+//            Log.i("LOCALLLLLLLLLLLLL", "LOCALLLLLLLLLLLLL");
             mode = "Local";
             startLocalLiveVideo();
             connectToFlaskServer();
         } else if ("remote".equals(intent.getAction())) {
-            Log.i("REMOTEEEEEEEEEEEE", "REMOTEEEEEEEEEEEE");
+//            Log.i("REMOTEEEEEEEEEEEE", "REMOTEEEEEEEEEEEE");
 //            stop();
             mode = "Remote";
             startRemoteLiveVideo();
@@ -212,7 +211,6 @@ public class LiveVideoService extends Service {
         }
         //Hide progress bar
 //        this.customForegroundNotificationView.setViewVisibility(R.id.progress_bar, View.GONE);
-        this.customForegroundNotificationView.setTextViewText(R.id.data, counter + "");
 
         this.foregroundNotification.setCustomContentView(customForegroundNotificationView);
         this.startForeground(1001, foregroundNotification.build());
@@ -320,8 +318,6 @@ public class LiveVideoService extends Service {
                 }
                 while (!shouldStop) {
                     if (!flashUpdating) {
-                        counter++;
-                        Log.i("COUNTER:  ", String.valueOf(counter));
                         BufferedInputStream bis = null;
                         FileOutputStream fos = null;
                         try {
